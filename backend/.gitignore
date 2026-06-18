@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables — NEVER commit real credentials
+.env
+*.env
+serviceAccountKey.json
+*serviceAccountKey*.json
+
+# Coverage and test artefacts
+.coverage
+htmlcov/
+.pytest_cache/
+*.xml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cloud Run / Docker
+*.dockerignore

@@ -1,0 +1,18 @@
+[tool.ruff]
+line-length = 100
+select = ["E", "W", "F", "I", "B", "UP"]
+ignore = []
+target-version = "py311"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["tests/*", "*/conftest.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
