@@ -646,6 +646,27 @@ async def delete_activity(uid: str, activity_id: str) -> dict[str, Any] | None:
     return activity
 
 
+async def get_activity_by_id(activity_id: str) -> dict[str, Any] | None:
+    """Retrieve a single activity document by Firestore document ID.
+
+    Used by the DELETE route to verify existence and ownership before
+    performing the delete. The caller is responsible for checking that
+    the returned document's 'user_id' matches the authenticated user.
+
+    Args:
+        activity_id: Firestore document ID in the 'activities' collection.
+
+    Returns:
+        A snake_case activity dict (including 'user_id') if the document
+        exists, or None if not found.
+    """
+    db = get_db()
+    snapshot = await db.collection("activities").document(activity_id).get()
+    if not snapshot.exists:
+        return None
+    return _activity_from_firestore(snapshot.id, snapshot.to_dict() or {})
+
+
 async def get_activities_summary(
     uid: str,
     start_date: str,
@@ -887,6 +908,30 @@ async def save_insights(uid: str, insight_data: dict[str, Any]) -> None:
     fs_doc = _insight_to_firestore(uid, insight_data)
     await db.collection("insights").document(uid).set(fs_doc)
     logger.info("Insights saved for uid=%s", uid)
+
+
+async def acknowledge_recommendation(uid: str, recommendation_id: str) -> None:
+    """Append a recommendation ID to the user's acknowledged list in Firestore.
+
+    Uses ArrayUnion so the operation is idempotent — adding an already-present
+    ID is a no-op. Future insight generations filter out acknowledged IDs.
+
+    Args:
+        uid: Firebase Auth UID (also the insights document ID).
+        recommendation_id: Stable snake_case recommendation identifier to acknowledge.
+
+    Returns:
+        None.
+    """
+    db = get_db()
+    doc_ref = db.collection("insights").document(uid)
+    await doc_ref.set(
+        {"acknowledgedIds": google.cloud.firestore.ArrayUnion([recommendation_id])},
+        merge=True,
+    )
+    logger.info(
+        "Recommendation acknowledged uid=%s rec_id=%s", uid, recommendation_id
+    )
 
 
 # ---------------------------------------------------------------------------
