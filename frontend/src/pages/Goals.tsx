@@ -43,8 +43,8 @@ const Goals: React.FC = () => {
     const now = new Date()
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
     fetchSummary({
-      start_date: startOfMonth.toISOString(),
-      end_date: now.toISOString(),
+      start_date: startOfMonth.toISOString().split('T')[0],
+      end_date: now.toISOString().split('T')[0],
     })
   }, [fetchGoals, fetchSummary])
 

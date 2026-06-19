@@ -27,8 +27,8 @@ const ActivityList: React.FC = () => {
         sevenDaysAgo.setHours(0, 0, 0, 0)
 
         const response = await activitiesApi.getAll({
-          start_date: sevenDaysAgo.toISOString(),
-          end_date: new Date().toISOString(),
+          start_date: sevenDaysAgo.toISOString().split('T')[0],
+          end_date: new Date().toISOString().split('T')[0],
         })
         setActivities(response.activities)
       } catch (err) {

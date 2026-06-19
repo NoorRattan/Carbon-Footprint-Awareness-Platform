@@ -46,9 +46,7 @@ export function timeAgo(isoDate: string): string {
  * @returns ISO date string for start of today
  */
 export function startOfToday(): string {
-  const d = new Date()
-  d.setHours(0, 0, 0, 0)
-  return d.toISOString()
+  return new Date().toISOString().split('T')[0]
 }
 
 /**
@@ -60,8 +58,7 @@ export function startOfWeek(): string {
   const day = d.getDay()
   const diff = day === 0 ? 6 : day - 1
   d.setDate(d.getDate() - diff)
-  d.setHours(0, 0, 0, 0)
-  return d.toISOString()
+  return d.toISOString().split('T')[0]
 }
 
 /**
@@ -71,8 +68,7 @@ export function startOfWeek(): string {
 export function startOfMonth(): string {
   const d = new Date()
   d.setDate(1)
-  d.setHours(0, 0, 0, 0)
-  return d.toISOString()
+  return d.toISOString().split('T')[0]
 }
 
 /**
@@ -102,8 +98,8 @@ export function getDateRange(period: 'week' | 'month' | 'year'): {
   start.setHours(0, 0, 0, 0)
 
   return {
-    start_date: start.toISOString(),
-    end_date: end.toISOString(),
+    start_date: start.toISOString().split('T')[0],
+    end_date: end.toISOString().split('T')[0],
   }
 }
 
