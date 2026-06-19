@@ -8,6 +8,7 @@ be called via run_in_executor to avoid blocking the async event loop.
 Calling it directly in an async function will cause intermittent hangs
 under load.
 """
+
 import asyncio
 import logging
 from typing import Annotated
@@ -23,9 +24,7 @@ _bearer_scheme = HTTPBearer(auto_error=False)
 
 
 async def require_auth(
-    credentials: Annotated[
-        HTTPAuthorizationCredentials | None, Depends(_bearer_scheme)
-    ] = None,
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer_scheme)] = None,
 ) -> dict:
     """Verify a Firebase ID token and return the decoded token payload.
 
@@ -67,25 +66,25 @@ async def require_auth(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token expired. Please sign in again.",
-        )
+        ) from None
     except firebase_admin.auth.InvalidIdTokenError as exc:
         logger.warning("Invalid Firebase ID token: %s", exc)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication token.",
-        )
+        ) from exc
     except firebase_admin.auth.RevokedIdTokenError:
         logger.warning("Revoked Firebase ID token presented.")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token has been revoked. Please sign in again.",
-        )
+        ) from None
     except Exception as exc:
         logger.exception("Unexpected error during token verification: %s", exc)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication failed.",
-        )
+        ) from exc
 
 
 # Convenience type alias — use this in route function signatures

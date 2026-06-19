@@ -3,8 +3,9 @@
 Provides functions called by route handlers after Firebase token
 verification to synchronise user state with Firestore.
 """
+
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from app.services.firestore_service import upsert_user
 
@@ -30,7 +31,7 @@ async def create_or_update_user_on_login(uid: str, token_data: dict) -> None:
     try:
         email: str = token_data.get("email", "")
         display_name: str = token_data.get("name", email.split("@")[0])
-        now: str = datetime.now(timezone.utc).isoformat()
+        now: str = datetime.now(UTC).isoformat()
 
         await upsert_user(
             uid=uid,

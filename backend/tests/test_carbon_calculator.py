@@ -4,6 +4,7 @@ Tests cover every calculate_carbon() code path, get_unit_label(),
 and spot-checks on EMISSION_FACTORS, NATIONAL_AVERAGES, and
 VALID_SUBCATEGORIES to catch any accidental data changes.
 """
+
 import logging
 
 import pytest
@@ -292,7 +293,11 @@ class TestValidSubcategories:
             None
         """
         assert set(VALID_SUBCATEGORIES.keys()) == {
-            "transport", "food", "energy", "shopping", "waste"
+            "transport",
+            "food",
+            "energy",
+            "shopping",
+            "waste",
         }
 
     def test_total_subcategory_count(self) -> None:
@@ -302,7 +307,7 @@ class TestValidSubcategories:
             None
         """
         total = sum(len(subs) for subs in VALID_SUBCATEGORIES.values())
-        assert total == 50
+        assert total == 52
 
 
 class TestSubcategoryLabels:
@@ -324,6 +329,6 @@ class TestSubcategoryLabels:
         """
         for cat, subcats in EMISSION_FACTORS.items():
             for sub in subcats:
-                assert sub in SUBCATEGORY_LABELS, (
-                    f"Subcategory '{sub}' in category '{cat}' has no label"
-                )
+                assert (
+                    sub in SUBCATEGORY_LABELS
+                ), f"Subcategory '{sub}' in category '{cat}' has no label"

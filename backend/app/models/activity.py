@@ -4,8 +4,9 @@ Activities represent individual carbon-emitting actions logged by the user
 (e.g., a car journey, a meal, home energy use). The carbon_kg field is
 always calculated server-side and is never accepted from clients.
 """
-from datetime import date
-from typing import Literal
+
+from datetime import date as DateType
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -13,9 +14,7 @@ from pydantic import BaseModel, Field, field_validator
 ActivityCategory = Literal["transport", "food", "energy", "shopping", "waste"]
 
 # All valid category strings as a set — used for runtime validation in routes
-VALID_CATEGORIES: frozenset[str] = frozenset(
-    {"transport", "food", "energy", "shopping", "waste"}
-)
+VALID_CATEGORIES: frozenset[str] = frozenset({"transport", "food", "energy", "shopping", "waste"})
 
 
 class ActivityCreate(BaseModel):
@@ -38,10 +37,14 @@ class ActivityCreate(BaseModel):
         gt=0,
         description="Quantity in the unit appropriate for the subcategory (km, kg, kWh, etc.).",
     )
-    date: date = Field(
-        ...,
-        description="Date the activity occurred (ISO format YYYY-MM-DD). Must not be in the future.",
-    )
+    date: Annotated[
+        DateType,
+        Field(
+            description=(
+                "Date the activity occurred (ISO format YYYY-MM-DD). " "Must not be in the future."
+            )
+        ),
+    ]
     notes: str | None = Field(
         default=None,
         max_length=200,
@@ -50,7 +53,7 @@ class ActivityCreate(BaseModel):
 
     @field_validator("date")
     @classmethod
-    def date_not_in_future(cls, v: date) -> date:
+    def date_not_in_future(cls, v: DateType) -> DateType:
         """Validate that the activity date is not in the future.
 
         Args:
@@ -116,7 +119,5 @@ class ActivitiesSummary(BaseModel):
     """
 
     total_carbon_kg: float = Field(..., description="Total CO₂e across all categories.")
-    by_category: CategoryTotals = Field(
-        ..., description="Carbon totals broken down by category."
-    )
+    by_category: CategoryTotals = Field(..., description="Carbon totals broken down by category.")
     period: PeriodBounds = Field(..., description="Date range covered by this summary.")

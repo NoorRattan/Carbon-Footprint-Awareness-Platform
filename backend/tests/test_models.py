@@ -1,4 +1,5 @@
 """Tests for all Pydantic model validation rules."""
+
 import logging
 from datetime import date, timedelta
 

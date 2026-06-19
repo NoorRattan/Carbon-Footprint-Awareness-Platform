@@ -3,9 +3,10 @@
 Initialises Firebase Admin SDK, configures CORS, rate limiting,
 security headers middleware, and registers all API routers.
 """
+
 import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 import firebase_admin
 from fastapi import FastAPI, Request
@@ -112,9 +113,7 @@ def create_app() -> FastAPI:
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         if settings.environment == "production":
-            response.headers["Strict-Transport-Security"] = (
-                "max-age=31536000; includeSubDomains"
-            )
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         return response
 
     # Global exception handler — never leak internal errors to clients

@@ -9,6 +9,7 @@ instances. This is acceptable for this application (personal tracker,
 not a high-value attack target). Pydantic validation is the primary
 defence against abuse. Documented in README under Known Limitations.
 """
+
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 

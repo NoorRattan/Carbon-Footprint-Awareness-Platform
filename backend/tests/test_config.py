@@ -1,4 +1,5 @@
 """Tests for application configuration loading and validation."""
+
 import logging
 
 import pytest
@@ -11,12 +12,16 @@ logger = logging.getLogger(__name__)
 class TestSettings:
     """Tests for the Settings model and get_settings factory."""
 
-    def test_default_environment_is_development(self) -> None:
-        """Default environment resolves to 'development'.
+    def test_default_environment_is_development(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Default environment resolves to 'development' when env var is not set.
+
+        Args:
+            monkeypatch: pytest monkeypatch fixture for environment variable injection.
 
         Returns:
             None
         """
+        monkeypatch.delenv("ENVIRONMENT", raising=False)
         settings = Settings()
         assert settings.environment == "development"
 

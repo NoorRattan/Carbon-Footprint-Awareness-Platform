@@ -4,6 +4,7 @@ Tests cover the generate_insights() async function with mocked activity data,
 verifying that recommendations are generated, ranked, and filtered correctly,
 and that badges are awarded based on user state.
 """
+
 import logging
 from datetime import date, timedelta
 
@@ -50,16 +51,17 @@ def _make_activity(
     """
     activity_date = (date.today() - timedelta(days=days_ago)).isoformat()
     return {
-        "category":   category,
+        "category": category,
         "subcategory": subcategory,
-        "carbon_kg":  carbon_kg,
-        "date":       activity_date,
+        "carbon_kg": carbon_kg,
+        "date": activity_date,
     }
 
 
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+
 
 class TestGenerateInsights:
     """Tests for the generate_insights() async function."""
@@ -255,9 +257,16 @@ class TestGenerateInsights:
             None
         """
         expected = {
-            "first_log", "week_streak", "month_streak", "below_average",
-            "carbon_cutter", "green_champion", "goal_setter", "goal_achiever",
-            "low_transport", "plant_powered",
+            "first_log",
+            "week_streak",
+            "month_streak",
+            "below_average",
+            "carbon_cutter",
+            "green_champion",
+            "goal_setter",
+            "goal_achiever",
+            "low_transport",
+            "plant_powered",
         }
         assert expected == set(BADGES.keys())
 

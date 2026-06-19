@@ -6,6 +6,7 @@ This package contains all business logic separated from HTTP routing:
 - firestore_service: all Firestore read/write operations
 - auth_service: Firebase token sync and user creation helpers
 """
+
 from app.services.carbon_calculator import (
     EMISSION_FACTORS,
     NATIONAL_AVERAGES,

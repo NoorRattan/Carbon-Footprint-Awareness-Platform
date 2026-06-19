@@ -4,6 +4,7 @@ Goals allow users to commit to specific reduction targets for a category
 over a defined time period. Baseline and target carbon values are calculated
 server-side at goal creation time.
 """
+
 from datetime import date
 from typing import Literal
 
@@ -21,9 +22,7 @@ class GoalCreate(BaseModel):
     from the last 30 days of activity data for the given category.
     """
 
-    title: str = Field(
-        ..., min_length=1, max_length=100, description="User-written goal title."
-    )
+    title: str = Field(..., min_length=1, max_length=100, description="User-written goal title.")
     category: GoalCategory = Field(
         ..., description="Category to reduce, or 'total' for overall footprint."
     )
@@ -52,7 +51,8 @@ class GoalCreate(BaseModel):
         Raises:
             ValueError: If end_date is fewer than 7 days from today.
         """
-        from datetime import date as date_type, timedelta
+        from datetime import date as date_type
+        from datetime import timedelta
 
         if v < date_type.today() + timedelta(days=7):
             raise ValueError("Goal end_date must be at least 7 days in the future.")

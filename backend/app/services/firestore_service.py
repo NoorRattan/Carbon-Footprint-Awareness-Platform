@@ -10,8 +10,9 @@ The AsyncClient is a module-level singleton created on first use.
 Cloud Run containers handle many concurrent requests — creating a new
 client per request would exhaust connections.
 """
+
 import logging
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 import google.cloud.firestore
@@ -40,6 +41,7 @@ def get_db() -> google.cloud.firestore.AsyncClient:
 # Private field-mapping helpers
 # ---------------------------------------------------------------------------
 
+
 def _user_to_firestore(data: dict[str, Any]) -> dict[str, Any]:
     """Map snake_case user dict keys to camelCase for Firestore writes.
 
@@ -50,14 +52,14 @@ def _user_to_firestore(data: dict[str, Any]) -> dict[str, Any]:
         Dictionary with camelCase field names ready for Firestore.
     """
     mapping: dict[str, str] = {
-        "display_name":    "displayName",
-        "diet_type":       "dietType",
-        "household_size":  "householdSize",
-        "last_seen":       "lastSeen",
+        "display_name": "displayName",
+        "diet_type": "dietType",
+        "household_size": "householdSize",
+        "last_seen": "lastSeen",
         "total_carbon_kg": "totalCarbonKg",
-        "monthly_totals":  "monthlyTotals",
-        "last_log_date":   "lastLogDate",
-        "created_at":      "createdAt",
+        "monthly_totals": "monthlyTotals",
+        "last_log_date": "lastLogDate",
+        "created_at": "createdAt",
     }
     return {mapping.get(k, k): v for k, v in data.items()}
 
@@ -72,21 +74,21 @@ def _user_from_firestore(doc_id: str, data: dict[str, Any]) -> dict[str, Any]:
     Returns:
         Dictionary with snake_case field names and a top-level 'uid' key.
     """
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     return {
-        "uid":             doc_id,
-        "email":           data.get("email", ""),
-        "display_name":    data.get("displayName", ""),
-        "region":          data.get("region", "OTHER"),
-        "diet_type":       data.get("dietType", "average"),
-        "household_size":  data.get("householdSize", 1),
-        "created_at":      _ts_to_str(data.get("createdAt", now)),
-        "streak":          data.get("streak", 0),
-        "badges":          data.get("badges", []),
+        "uid": doc_id,
+        "email": data.get("email", ""),
+        "display_name": data.get("displayName", ""),
+        "region": data.get("region", "OTHER"),
+        "diet_type": data.get("dietType", "average"),
+        "household_size": data.get("householdSize", 1),
+        "created_at": _ts_to_str(data.get("createdAt", now)),
+        "streak": data.get("streak", 0),
+        "badges": data.get("badges", []),
         "total_carbon_kg": data.get("totalCarbonKg", 0.0),
-        "monthly_totals":  data.get("monthlyTotals", {}),
-        "last_log_date":   data.get("lastLogDate"),
-        "last_seen":       _ts_to_str(data.get("lastSeen", now)),
+        "monthly_totals": data.get("monthlyTotals", {}),
+        "last_log_date": data.get("lastLogDate"),
+        "last_seen": _ts_to_str(data.get("lastSeen", now)),
     }
 
 
@@ -101,15 +103,15 @@ def _activity_to_firestore(uid: str, data: dict[str, Any]) -> dict[str, Any]:
         Dictionary with camelCase field names ready for Firestore.
     """
     return {
-        "userId":     uid,
-        "category":   data["category"],
+        "userId": uid,
+        "category": data["category"],
         "subcategory": data["subcategory"],
-        "amount":     data["amount"],
-        "unit":       data["unit"],
-        "carbonKg":   data["carbon_kg"],
-        "date":       data["date"],
-        "notes":      data.get("notes"),
-        "createdAt":  data.get("created_at", datetime.now(timezone.utc).isoformat()),
+        "amount": data["amount"],
+        "unit": data["unit"],
+        "carbonKg": data["carbon_kg"],
+        "date": data["date"],
+        "notes": data.get("notes"),
+        "createdAt": data.get("created_at", datetime.now(UTC).isoformat()),
     }
 
 
@@ -124,16 +126,16 @@ def _activity_from_firestore(doc_id: str, data: dict[str, Any]) -> dict[str, Any
         Dictionary with snake_case field names and an 'id' key.
     """
     return {
-        "id":          doc_id,
-        "user_id":     data.get("userId", ""),
-        "category":    data.get("category", ""),
+        "id": doc_id,
+        "user_id": data.get("userId", ""),
+        "category": data.get("category", ""),
         "subcategory": data.get("subcategory", ""),
-        "amount":      data.get("amount", 0.0),
-        "unit":        data.get("unit", ""),
-        "carbon_kg":   data.get("carbonKg", 0.0),
-        "date":        data.get("date", ""),
-        "notes":       data.get("notes"),
-        "created_at":  _ts_to_str(data.get("createdAt", "")),
+        "amount": data.get("amount", 0.0),
+        "unit": data.get("unit", ""),
+        "carbon_kg": data.get("carbonKg", 0.0),
+        "date": data.get("date", ""),
+        "notes": data.get("notes"),
+        "created_at": _ts_to_str(data.get("createdAt", "")),
     }
 
 
@@ -148,16 +150,16 @@ def _goal_to_firestore(uid: str, data: dict[str, Any]) -> dict[str, Any]:
         Dictionary with camelCase field names ready for Firestore.
     """
     return {
-        "userId":                uid,
-        "title":                 data["title"],
-        "category":              data["category"],
+        "userId": uid,
+        "title": data["title"],
+        "category": data["category"],
         "targetReductionPercent": data["target_reduction_percent"],
-        "baselineCarbonKg":      data["baseline_carbon_kg"],
-        "targetCarbonKg":        data["target_carbon_kg"],
-        "startDate":             data["start_date"],
-        "endDate":               data["end_date"],
-        "status":                data.get("status", "active"),
-        "createdAt":             data.get("created_at", datetime.now(timezone.utc).isoformat()),
+        "baselineCarbonKg": data["baseline_carbon_kg"],
+        "targetCarbonKg": data["target_carbon_kg"],
+        "startDate": data["start_date"],
+        "endDate": data["end_date"],
+        "status": data.get("status", "active"),
+        "createdAt": data.get("created_at", datetime.now(UTC).isoformat()),
     }
 
 
@@ -172,17 +174,17 @@ def _goal_from_firestore(doc_id: str, data: dict[str, Any]) -> dict[str, Any]:
         Dictionary with snake_case field names and an 'id' key.
     """
     return {
-        "id":                     doc_id,
-        "user_id":                data.get("userId", ""),
-        "title":                  data.get("title", ""),
-        "category":               data.get("category", ""),
+        "id": doc_id,
+        "user_id": data.get("userId", ""),
+        "title": data.get("title", ""),
+        "category": data.get("category", ""),
         "target_reduction_percent": data.get("targetReductionPercent", 0.0),
-        "baseline_carbon_kg":     data.get("baselineCarbonKg", 0.0),
-        "target_carbon_kg":       data.get("targetCarbonKg", 0.0),
-        "start_date":             data.get("startDate", ""),
-        "end_date":               data.get("endDate", ""),
-        "status":                 data.get("status", "active"),
-        "created_at":             _ts_to_str(data.get("createdAt", "")),
+        "baseline_carbon_kg": data.get("baselineCarbonKg", 0.0),
+        "target_carbon_kg": data.get("targetCarbonKg", 0.0),
+        "start_date": data.get("startDate", ""),
+        "end_date": data.get("endDate", ""),
+        "status": data.get("status", "active"),
+        "created_at": _ts_to_str(data.get("createdAt", "")),
     }
 
 
@@ -198,23 +200,25 @@ def _insight_to_firestore(uid: str, data: dict[str, Any]) -> dict[str, Any]:
     """
     recommendations = []
     for rec in data.get("recommendations", []):
-        recommendations.append({
-            "id":               rec.get("id", ""),
-            "title":            rec.get("title", ""),
-            "description":      rec.get("description", ""),
-            "category":         rec.get("category", ""),
-            "estimatedSavingKg": rec.get("estimated_saving_kg", 0.0),
-            "difficulty":       rec.get("difficulty", "medium"),
-        })
+        recommendations.append(
+            {
+                "id": rec.get("id", ""),
+                "title": rec.get("title", ""),
+                "description": rec.get("description", ""),
+                "category": rec.get("category", ""),
+                "estimatedSavingKg": rec.get("estimated_saving_kg", 0.0),
+                "difficulty": rec.get("difficulty", "medium"),
+            }
+        )
     return {
-        "userId":               uid,
-        "generatedAt":          data.get("generated_at", datetime.now(timezone.utc).isoformat()),
-        "footprintKg":          data.get("footprint_kg", 0.0),
-        "vsAveragePercent":     data.get("vs_average_percent", 0.0),
-        "topCategory":          data.get("top_category"),
+        "userId": uid,
+        "generatedAt": data.get("generated_at", datetime.now(UTC).isoformat()),
+        "footprintKg": data.get("footprint_kg", 0.0),
+        "vsAveragePercent": data.get("vs_average_percent", 0.0),
+        "topCategory": data.get("top_category"),
         "monthlyChangePercent": data.get("monthly_change_percent", 0.0),
-        "recommendations":      recommendations,
-        "achievements":         data.get("achievements", []),
+        "recommendations": recommendations,
+        "achievements": data.get("achievements", []),
     }
 
 
@@ -229,22 +233,24 @@ def _insight_from_firestore(data: dict[str, Any]) -> dict[str, Any]:
     """
     recommendations = []
     for rec in data.get("recommendations", []):
-        recommendations.append({
-            "id":                rec.get("id", ""),
-            "title":             rec.get("title", ""),
-            "description":       rec.get("description", ""),
-            "category":          rec.get("category", ""),
-            "estimated_saving_kg": rec.get("estimatedSavingKg", 0.0),
-            "difficulty":        rec.get("difficulty", "medium"),
-        })
+        recommendations.append(
+            {
+                "id": rec.get("id", ""),
+                "title": rec.get("title", ""),
+                "description": rec.get("description", ""),
+                "category": rec.get("category", ""),
+                "estimated_saving_kg": rec.get("estimatedSavingKg", 0.0),
+                "difficulty": rec.get("difficulty", "medium"),
+            }
+        )
     return {
-        "footprint_kg":          data.get("footprintKg", 0.0),
-        "vs_average_percent":    data.get("vsAveragePercent", 0.0),
-        "top_category":          data.get("topCategory"),
+        "footprint_kg": data.get("footprintKg", 0.0),
+        "vs_average_percent": data.get("vsAveragePercent", 0.0),
+        "top_category": data.get("topCategory"),
         "monthly_change_percent": data.get("monthlyChangePercent", 0.0),
-        "recommendations":       recommendations,
-        "achievements":          data.get("achievements", []),
-        "generated_at":          _ts_to_str(data.get("generatedAt", "")),
+        "recommendations": recommendations,
+        "achievements": data.get("achievements", []),
+        "generated_at": _ts_to_str(data.get("generatedAt", "")),
     }
 
 
@@ -259,12 +265,12 @@ def _education_from_firestore(doc_id: str, data: dict[str, Any]) -> dict[str, An
         Dictionary with snake_case field names matching EducationSummary/Detail shape.
     """
     return {
-        "slug":       doc_id,
-        "title":      data.get("title", ""),
-        "category":   data.get("category", "general"),
-        "read_time":  data.get("readTime", 1),
+        "slug": doc_id,
+        "title": data.get("title", ""),
+        "category": data.get("category", "general"),
+        "read_time": data.get("readTime", 1),
         "updated_at": _ts_to_str(data.get("updatedAt", "")),
-        "content":    data.get("content", ""),
+        "content": data.get("content", ""),
     }
 
 
@@ -287,6 +293,7 @@ def _ts_to_str(value: Any) -> str:
 # ---------------------------------------------------------------------------
 # Private streak helper
 # ---------------------------------------------------------------------------
+
 
 async def _update_streak(uid: str, activity_date_str: str) -> None:
     """Update the user's consecutive logging streak after a new activity.
@@ -328,16 +335,19 @@ async def _update_streak(uid: str, activity_date_str: str) -> None:
     else:
         new_streak = 1
 
-    await user_ref.update({
-        "streak": new_streak,
-        "lastLogDate": today.isoformat(),
-    })
+    await user_ref.update(
+        {
+            "streak": new_streak,
+            "lastLogDate": today.isoformat(),
+        }
+    )
     logger.debug("Streak updated for uid=%s: %d → %d", uid, current_streak, new_streak)
 
 
 # ---------------------------------------------------------------------------
 # Private monthly totals helper
 # ---------------------------------------------------------------------------
+
 
 async def _update_monthly_totals(uid: str, year_month: str, delta_kg: float) -> None:
     """Atomically update the user's monthly CO₂e total for a given month.
@@ -364,18 +374,19 @@ async def _update_monthly_totals(uid: str, year_month: str, delta_kg: float) -> 
     total_carbon_kg = float(data.get("totalCarbonKg", 0.0))
     new_total = max(0.0, round(total_carbon_kg + delta_kg, 4))
 
-    await user_ref.update({
-        "monthlyTotals": monthly_totals,
-        "totalCarbonKg": new_total,
-    })
-    logger.debug(
-        "Monthly totals updated for uid=%s month=%s delta=%.4f", uid, year_month, delta_kg
+    await user_ref.update(
+        {
+            "monthlyTotals": monthly_totals,
+            "totalCarbonKg": new_total,
+        }
     )
+    logger.debug("Monthly totals updated for uid=%s month=%s delta=%.4f", uid, year_month, delta_kg)
 
 
 # ---------------------------------------------------------------------------
 # User functions
 # ---------------------------------------------------------------------------
+
 
 async def get_user(uid: str) -> dict[str, Any] | None:
     """Retrieve a user document from Firestore by UID.
@@ -417,19 +428,19 @@ async def upsert_user(uid: str, **kwargs: Any) -> None:
     user_ref: AsyncDocumentReference = db.collection("users").document(uid)
     snapshot = await user_ref.get()
 
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
 
     # Build the base document for first-login creation
     if not snapshot.exists:
         base: dict[str, Any] = {
-            "region":        "OTHER",
-            "dietType":      "average",
+            "region": "OTHER",
+            "dietType": "average",
             "householdSize": 1,
-            "streak":        0,
-            "badges":        [],
+            "streak": 0,
+            "badges": [],
             "totalCarbonKg": 0.0,
             "monthlyTotals": {},
-            "createdAt":     now,
+            "createdAt": now,
         }
     else:
         base = {}
@@ -511,6 +522,7 @@ async def delete_user_data(uid: str) -> None:
 # Activity functions
 # ---------------------------------------------------------------------------
 
+
 async def log_activity(
     uid: str,
     category: str,
@@ -541,15 +553,15 @@ async def log_activity(
         A snake_case dict of the written document including the generated id.
     """
     db = get_db()
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     doc_data: dict[str, Any] = {
-        "category":   category,
+        "category": category,
         "subcategory": subcategory,
-        "amount":     amount,
-        "unit":       unit,
-        "carbon_kg":  carbon_kg,
-        "date":       date_str,
-        "notes":      notes,
+        "amount": amount,
+        "unit": unit,
+        "carbon_kg": carbon_kg,
+        "date": date_str,
+        "notes": notes,
         "created_at": now,
     }
     fs_doc = _activity_to_firestore(uid, doc_data)
@@ -717,6 +729,7 @@ async def get_activities_summary(
 # Goal functions
 # ---------------------------------------------------------------------------
 
+
 async def create_goal(
     uid: str,
     title: str,
@@ -746,17 +759,17 @@ async def create_goal(
         A snake_case dict of the written document including the generated id.
     """
     db = get_db()
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     doc_data: dict[str, Any] = {
-        "title":                   title,
-        "category":                category,
+        "title": title,
+        "category": category,
         "target_reduction_percent": target_reduction_percent,
-        "baseline_carbon_kg":      baseline_carbon_kg,
-        "target_carbon_kg":        target_carbon_kg,
-        "start_date":              start_date,
-        "end_date":                end_date,
-        "status":                  "active",
-        "created_at":              now,
+        "baseline_carbon_kg": baseline_carbon_kg,
+        "target_carbon_kg": target_carbon_kg,
+        "start_date": start_date,
+        "end_date": end_date,
+        "status": "active",
+        "created_at": now,
     }
     fs_doc = _goal_to_firestore(uid, doc_data)
     _, doc_ref = await db.collection("goals").add(fs_doc)
@@ -800,9 +813,7 @@ async def get_goals(uid: str, status: str | None = None) -> list[dict[str, Any]]
     return results
 
 
-async def update_goal(
-    uid: str, goal_id: str, updates: dict[str, Any]
-) -> dict[str, Any] | None:
+async def update_goal(uid: str, goal_id: str, updates: dict[str, Any]) -> dict[str, Any] | None:
     """Update specific fields on an existing goal document.
 
     Only writes the fields present in `updates`. Performs no ownership check
@@ -826,9 +837,9 @@ async def update_goal(
 
     # Map snake_case updates to camelCase
     mapping: dict[str, str] = {
-        "title":                   "title",
-        "end_date":                "endDate",
-        "status":                  "status",
+        "title": "title",
+        "end_date": "endDate",
+        "status": "status",
         "target_reduction_percent": "targetReductionPercent",
     }
     fs_updates: dict[str, Any] = {}
@@ -869,6 +880,7 @@ async def delete_goal(uid: str, goal_id: str) -> dict[str, Any] | None:
 # ---------------------------------------------------------------------------
 # Insight functions
 # ---------------------------------------------------------------------------
+
 
 async def get_insights(uid: str) -> dict[str, Any] | None:
     """Retrieve the cached insights document for a user.
@@ -929,14 +941,13 @@ async def acknowledge_recommendation(uid: str, recommendation_id: str) -> None:
         {"acknowledgedIds": google.cloud.firestore.ArrayUnion([recommendation_id])},
         merge=True,
     )
-    logger.info(
-        "Recommendation acknowledged uid=%s rec_id=%s", uid, recommendation_id
-    )
+    logger.info("Recommendation acknowledged uid=%s rec_id=%s", uid, recommendation_id)
 
 
 # ---------------------------------------------------------------------------
 # Education functions
 # ---------------------------------------------------------------------------
+
 
 async def get_education(category: str | None = None) -> list[dict[str, Any]]:
     """Retrieve published education article summaries.

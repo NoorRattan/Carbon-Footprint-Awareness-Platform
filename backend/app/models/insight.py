@@ -4,6 +4,7 @@ InsightResponse is the complete output of generate_insights() — it
 includes the user's footprint summary, personalised recommendations
 ranked by estimated CO₂e saving, and earned achievement badges.
 """
+
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -32,9 +33,7 @@ class Recommendation(BaseModel):
             "the user's actual activity data."
         ),
     )
-    category: str = Field(
-        ..., description="The emission category this recommendation addresses."
-    )
+    category: str = Field(..., description="The emission category this recommendation addresses.")
     estimated_saving_kg: float = Field(
         ...,
         ge=0,
@@ -52,9 +51,7 @@ class InsightResponse(BaseModel):
     and refreshed if the cache is older than 6 hours or explicitly requested.
     """
 
-    footprint_kg: float = Field(
-        ..., description="Total CO₂e logged in the last 30 days (kg)."
-    )
+    footprint_kg: float = Field(..., description="Total CO₂e logged in the last 30 days (kg).")
     vs_average_percent: float = Field(
         ...,
         description=(
@@ -64,7 +61,9 @@ class InsightResponse(BaseModel):
     )
     top_category: str | None = Field(
         default=None,
-        description="The category with the highest CO₂e contribution. None if no activities logged.",
+        description=(
+            "The category with the highest CO₂e contribution. " "None if no activities logged."
+        ),
     )
     monthly_change_percent: float = Field(
         default=0.0,

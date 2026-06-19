@@ -1,164 +1,158 @@
 # EcoTrack — Carbon Footprint Awareness Platform
 
-EcoTrack helps individuals understand, track, and reduce their personal carbon footprint
-through activity logging, real emission-factor data, and a personalised AI-powered
-recommendation engine.
+EcoTrack helps individuals understand, track, and reduce their personal carbon
+footprint through practical education, simple daily activity logging, verified
+emission factors, and AI-powered personalised recommendations.
 
-## Three Core Pillars
+## Live Demo
 
-| Pillar | Path | Description |
-|--------|------|-------------|
-| **Understand** | `/learn` | 5 education articles, one per emission category, with cited data sources |
-| **Track** | `/log` | Activity form with 50+ subcategories and live carbon estimates |
-| **Reduce** | `/insights` | SmartAdvisor with 9 recommendation rules ranked by estimated annual CO₂e saving |
+- **App:** https://ecotrack-app-2026.web.app
+- **API Health:** https://ecotrack-api-[hash]-uc.a.run.app/api/v1/health
 
----
+## What It Does
+
+- 🌱 **Understand** — Five categories of educational articles explain where
+  emissions come from, backed by DESNZ, EPA, IPCC, IEA, WRAP, and Our World in
+  Data sources
+- 📊 **Track** — Log daily activities across transport, food, energy, shopping,
+  and waste using verified emission factors in kg CO2e per unit
+- 💡 **Reduce** — A personalised recommendation engine analyses activity
+  history and ranks actions by estimated annual CO2e saving
+
+## Architecture
+
+```text
+Browser
+  -> Firebase Hosting (CDN)
+      -> React 18 SPA (TypeScript, Vite, Tailwind)
+          -> Cloud Run API (FastAPI, Python 3.11)
+              -> Cloud Firestore (NoSQL)
+              -> Firebase Auth (JWT verification)
+```
 
 ## Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
-| Language | Python 3.11 |
-| Framework | FastAPI (async) |
-| Database | Google Cloud Firestore (native mode) |
-| Auth | Firebase Admin SDK — JWT on every protected endpoint |
-| Deployment | Google Cloud Run |
-| Container | `python:3.11-slim` |
-| Linting | `ruff` — zero tolerance |
-| Tests | `pytest` + `pytest-asyncio` + `pytest-mock` |
-| Rate limiting | `slowapi` (per-IP, in-memory) |
+|---|---|
+| Frontend | React 18, TypeScript strict, Vite 5, Tailwind CSS v3 |
+| Backend | FastAPI, Python 3.11, Pydantic v2 |
+| Database | Google Cloud Firestore native mode |
+| Auth | Firebase Auth with Google OAuth and email/password |
+| Hosting | Firebase Hosting for the frontend, Cloud Run for the backend |
+| CI/CD | GitHub Actions |
 
----
+## Local Setup
 
-## Backend
+### Prerequisites
 
-### Directory Structure
+- Node.js 20 LTS
+- Python 3.11
+- A Firebase project with Firestore and Auth enabled
 
-```
-backend/
-├── Dockerfile
-├── requirements.txt
-├── requirements-dev.txt
-├── pyproject.toml          # ruff + coverage config
-├── pytest.ini              # asyncio_mode = auto
-├── .env.example            # copy to .env and fill values
-├── main.py                 # FastAPI app entry point
-└── app/
-    ├── config.py           # pydantic-settings, lru_cache singleton
-    ├── limiter.py          # slowapi Limiter singleton
-    ├── middleware/
-    │   └── auth.py         # Firebase JWT dependency
-    ├── models/
-    │   ├── activity.py
-    │   ├── education.py
-    │   ├── goal.py
-    │   ├── insight.py
-    │   └── user.py
-    └── routes/
-        ├── activities.py
-        ├── education.py
-        ├── goals.py
-        ├── insights.py
-        └── user.py
-```
-
-### Local Development Setup
+### Backend
 
 ```bash
 cd backend
-
-# Create virtual environment
-python -m venv .venv
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # macOS/Linux
-
-# Install dev dependencies
+cp .env.example .env
 pip install -r requirements-dev.txt
-
-# Configure environment
-copy .env.example .env
-# Edit .env — set FIREBASE_SERVICE_ACCOUNT_KEY to your downloaded JSON path
-
-# Run development server
-uvicorn main:app --reload --host 0.0.0.0 --port 8080
+uvicorn main:app --reload
 ```
 
-API documentation is available at `http://localhost:8080/docs` in development.
+Fill `backend/.env` with your Firebase and API configuration before starting
+the server.
 
-### Running Tests
+### Frontend
+
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
+
+Fill `frontend/.env` with your Firebase web configuration and API URL.
+
+## Environment Variables
+
+### Backend (`backend/.env`)
+
+| Variable | Description |
+|---|---|
+| `GOOGLE_CLOUD_PROJECT` | GCP project ID |
+| `FIREBASE_SERVICE_ACCOUNT_KEY` | Path to the Firebase service account JSON |
+| `ENVIRONMENT` | `development`, `test`, or `production` |
+| `ALLOWED_ORIGINS` | Comma-separated frontend URLs allowed by CORS |
+| `SECRET_KEY` | Random string at least 32 characters long |
+| `RATE_LIMIT_PER_MINUTE` | API rate limit per IP, default `60` |
+
+### Frontend (`frontend/.env`)
+
+| Variable | Description |
+|---|---|
+| `VITE_API_BASE_URL` | Backend API URL ending in `/api/v1` |
+| `VITE_FIREBASE_API_KEY` | Firebase web API key |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Firebase Auth domain |
+| `VITE_FIREBASE_PROJECT_ID` | Firebase project ID |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Firebase Storage bucket |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID |
+| `VITE_FIREBASE_APP_ID` | Firebase web app ID |
+| `VITE_FIREBASE_MEASUREMENT_ID` | Firebase Analytics measurement ID |
+
+## Running Tests
+
+### Backend
 
 ```bash
 cd backend
-pytest --cov=app --cov-report=term-missing
+pytest tests/ --cov=app --cov-report=term-missing --cov-fail-under=80
+ruff check . && ruff format --check .
+python -m pip_audit -r requirements.txt
 ```
 
-Coverage is enforced at ≥80% line coverage in CI.
+Coverage target: at least 80%.
 
-### Linting
+### Frontend
 
 ```bash
-cd backend
-ruff check .
-ruff format --check .
+cd frontend
+npm run lint
+npx prettier --check "src/**/*.{ts,tsx}"
+npm run test:coverage
+npm run build
+npm audit --audit-level=moderate
 ```
 
-Zero ruff errors are required. The CI pipeline will fail on any lint issue.
+Coverage target: at least 70% lines, functions, and statements, with at least
+65% branches.
 
-### Docker Build
+## Deployment
 
-```bash
-cd backend
-docker build -t ecotrack-backend .
-docker run -p 8080:8080 --env-file .env ecotrack-backend
-```
+Push to `main` after the required GitHub secrets are configured. GitHub Actions
+runs backend tests, deploys the API to Cloud Run, builds and verifies the
+frontend, then deploys Firebase Hosting.
 
----
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for first-time setup instructions.
 
-## API Endpoints
+## Data Sources
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| GET | `/api/v1/health` | Public | Health check |
-| GET | `/api/v1/activities` | ★ | List user activities |
-| POST | `/api/v1/activities` | ★ | Log a new activity |
-| DELETE | `/api/v1/activities/{id}` | ★ | Delete an activity |
-| GET | `/api/v1/activities/summary` | ★ | Carbon totals by category |
-| GET | `/api/v1/insights` | ★ | SmartAdvisor recommendations |
-| POST | `/api/v1/insights/acknowledge/{id}` | ★ | Acknowledge a recommendation |
-| GET | `/api/v1/goals` | ★ | List reduction goals |
-| POST | `/api/v1/goals` | ★ | Create a reduction goal |
-| PUT | `/api/v1/goals/{id}` | ★ | Update a goal |
-| DELETE | `/api/v1/goals/{id}` | ★ | Delete a goal |
-| GET | `/api/v1/user/profile` | ★ | Get user profile |
-| PUT | `/api/v1/user/profile` | ★ | Update user profile |
-| DELETE | `/api/v1/user/account` | ★ | Delete account (GDPR) |
-| GET | `/api/v1/education` | Public | List education articles |
-| GET | `/api/v1/education/{slug}` | Public | Get article detail |
+- [UK DESNZ GHG Conversion Factors 2024](https://www.gov.uk/government/collections/government-conversion-factors-for-company-reporting)
+- [US EPA Emission Factors for Greenhouse Gas Inventories 2024](https://www.epa.gov/climateleadership/ghg-emission-factors-hub)
+- [IPCC Fifth Assessment Report — Global Warming Potentials](https://www.ipcc.ch/assessment-report/ar5/)
+- [Our World in Data — Food and Land Use](https://ourworldindata.org/environmental-impacts-of-food)
+- [IEA Electricity Emission Factors 2023](https://www.iea.org/data-and-statistics/data-product/emissions-factors-2023)
 
-★ Requires `Authorization: Bearer <Firebase ID token>` header.
+## Accessibility
 
----
-
-## Security
-
-- **HTTPS only** — Cloud Run enforces HTTP→HTTPS redirect.
-- **CORS strict allowlist** — configured via `ALLOWED_ORIGINS` env var; wildcard is never used in production.
-- **JWT verification** — `firebase_admin.auth.verify_id_token()` called via `run_in_executor` (non-blocking).
-- **Ownership enforcement** — resources belonging to another user return `404`, not `403`, to prevent information leakage.
-- **Input validation** — all request bodies validated by Pydantic v2.
-- **Security headers** — `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and `HSTS` (production) on every response.
-- **Secrets via env vars** — no credentials are hardcoded.
-- **`carbon_kg` server-side only** — never accepted from the client; always computed from emission factors.
-- **GDPR** — `DELETE /api/v1/user/account` permanently wipes all user data from Firestore.
+EcoTrack targets WCAG 2.1 AA compliance. Pages include skip navigation, clear
+heading hierarchy, keyboard-visible focus states, ARIA labels on interactive
+controls and charts, semantic forms, and reduced-motion support.
 
 ## Known Limitations
 
-- **Rate limiting is per-instance**: `slowapi` uses in-memory counters. On Cloud Run with multiple instances, rate limits are not shared across instances. Pydantic validation is the primary defence against malformed input abuse. A distributed rate limiting solution (e.g., Redis) can be added if required.
+- Rate limiting uses in-memory counters per Cloud Run instance. Under high load
+  with multiple instances active, limits are not shared across instances.
+  Pydantic validation provides the primary abuse defence.
 
----
+## License
 
-## GCP Project
-
-**Project ID:** `ecotrack-app-2026`
-
-Deployed on Google Cloud Run. Firestore database is in native mode.
+MIT

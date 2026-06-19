@@ -3,6 +3,7 @@
 UserProfile represents the persisted user document in Firestore.
 UserProfileUpdate is used for PATCH-style updates — all fields optional.
 """
+
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -64,9 +65,7 @@ class UserProfileUpdate(BaseModel):
     region: UserRegion | None = Field(
         default=None, description="New region (UK, US, EU, IN, AU, or OTHER)."
     )
-    diet_type: DietType | None = Field(
-        default=None, description="New diet type."
-    )
+    diet_type: DietType | None = Field(default=None, description="New diet type.")
     household_size: int | None = Field(
         default=None, ge=1, le=10, description="New household size (1–10)."
     )

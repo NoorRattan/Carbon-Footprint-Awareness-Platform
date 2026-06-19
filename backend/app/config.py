@@ -3,6 +3,7 @@
 Reads all configuration from environment variables with type validation.
 Use get_settings() everywhere — it is cached after the first call.
 """
+
 import logging
 from functools import lru_cache
 

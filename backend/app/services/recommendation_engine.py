@@ -12,9 +12,10 @@ usage patterns.
 
 Called by: GET /api/v1/insights (via firestore_service cache layer)
 """
+
 import logging
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from app.models.insight import InsightResponse, Recommendation
@@ -26,16 +27,16 @@ logger = logging.getLogger(__name__)
 CATEGORIES: list[str] = ["transport", "food", "energy", "shopping", "waste"]
 
 BADGES: dict[str, str] = {
-    "first_log":      "Logged your first activity",
-    "week_streak":    "7-day logging streak",
-    "month_streak":   "30-day logging streak",
-    "below_average":  "Footprint below national average",
-    "carbon_cutter":  "Reduced monthly footprint by 10%+",
+    "first_log": "Logged your first activity",
+    "week_streak": "7-day logging streak",
+    "month_streak": "30-day logging streak",
+    "below_average": "Footprint below national average",
+    "carbon_cutter": "Reduced monthly footprint by 10%+",
     "green_champion": "Reduced monthly footprint by 25%+",
-    "goal_setter":    "Created your first reduction goal",
-    "goal_achiever":  "Completed a reduction goal",
-    "low_transport":  "Transport footprint under 50 kg this month",
-    "plant_powered":  "No meat logged in 7 days",
+    "goal_setter": "Created your first reduction goal",
+    "goal_achiever": "Completed a reduction goal",
+    "low_transport": "Transport footprint under 50 kg this month",
+    "plant_powered": "No meat logged in 7 days",
 }
 
 
@@ -72,9 +73,7 @@ async def generate_insights(
 
     by_category: dict[str, float] = {
         cat: sum(
-            float(a.get("carbon_kg", 0))
-            for a in activities_current
-            if a.get("category") == cat
+            float(a.get("carbon_kg", 0)) for a in activities_current if a.get("category") == cat
         )
         for cat in CATEGORIES
     }
@@ -83,14 +82,6 @@ async def generate_insights(
     for activity in activities_current:
         subcategory = activity.get("subcategory", "")
         by_subcategory[subcategory] += float(activity.get("carbon_kg", 0))
-
-    # ------------------------------------------------------------------
-    # Step 2: Calculate category percentages
-    # ------------------------------------------------------------------
-    pct: dict[str, float] = {
-        cat: (kg / total_kg * 100) if total_kg > 0 else 0.0
-        for cat, kg in by_category.items()
-    }
 
     # ------------------------------------------------------------------
     # Step 3: Identify top category (highest CO₂e contribution)
@@ -113,21 +104,15 @@ async def generate_insights(
     # ------------------------------------------------------------------
     # Step 5: Calculate monthly change vs previous 30-day period
     # ------------------------------------------------------------------
-    previous_total_kg: float = sum(
-        float(a.get("carbon_kg", 0)) for a in activities_previous
-    )
+    previous_total_kg: float = sum(float(a.get("carbon_kg", 0)) for a in activities_previous)
     monthly_change_percent: float = (
-        ((total_kg - previous_total_kg) / previous_total_kg) * 100
-        if previous_total_kg > 0
-        else 0.0
+        ((total_kg - previous_total_kg) / previous_total_kg) * 100 if previous_total_kg > 0 else 0.0
     )
 
     # ------------------------------------------------------------------
     # Step 6: Build template variable dict for recommendation formatting
     # ------------------------------------------------------------------
-    car_kg = (
-        by_subcategory.get("car_petrol", 0.0) + by_subcategory.get("car_diesel", 0.0)
-    )
+    car_kg = by_subcategory.get("car_petrol", 0.0) + by_subcategory.get("car_diesel", 0.0)
     car_pct = (
         (car_kg / by_category.get("transport", 1)) * 100
         if by_category.get("transport", 0) > 0
@@ -154,10 +139,7 @@ async def generate_insights(
         + by_subcategory.get("electricity_au", 0.0)
     )
     heat_pct = (
-        (
-            by_subcategory.get("natural_gas", 0.0)
-            + by_subcategory.get("heating_oil", 0.0)
-        )
+        (by_subcategory.get("natural_gas", 0.0) + by_subcategory.get("heating_oil", 0.0))
         / by_category.get("energy", 1)
         * 100
         if by_category.get("energy", 0) > 0
@@ -167,17 +149,17 @@ async def generate_insights(
     landfill_carbon = landfill_kg * 0.587
 
     template_vars: dict[str, Any] = {
-        "car_pct":         car_pct,
-        "car_kg":          car_kg,
-        "region":          user_profile.region,
-        "flight_pct":      flight_pct,
-        "beef_kg":         beef_kg,
-        "meat_kg":         meat_kg,
-        "elec_kg":         elec_kg,
-        "heat_pct":        heat_pct,
-        "landfill_kg":     landfill_kg,
+        "car_pct": car_pct,
+        "car_kg": car_kg,
+        "region": user_profile.region,
+        "flight_pct": flight_pct,
+        "beef_kg": beef_kg,
+        "meat_kg": meat_kg,
+        "elec_kg": elec_kg,
+        "heat_pct": heat_pct,
+        "landfill_kg": landfill_kg,
         "landfill_carbon": landfill_carbon,
-        "saving":          0.0,  # overwritten per-rule below
+        "saving": 0.0,  # overwritten per-rule below
     }
 
     # ------------------------------------------------------------------
@@ -186,11 +168,11 @@ async def generate_insights(
     rules: list[dict[str, Any]] = [
         # --- TRANSPORT ---
         {
-            "id":    "switch_to_public_transport",
+            "id": "switch_to_public_transport",
             "condition": (
                 by_category.get("transport", 0) > 0
-                and by_subcategory.get("car_petrol", 0.0)
-                + by_subcategory.get("car_diesel", 0.0) > 40
+                and by_subcategory.get("car_petrol", 0.0) + by_subcategory.get("car_diesel", 0.0)
+                > 40
             ),
             "title": "Switch to public transport for regular journeys",
             "description_template": (
@@ -199,17 +181,17 @@ async def generate_insights(
                 "approximately {saving:.0f} kg CO₂e per year."
             ),
             "saving_kg": (
-                by_subcategory.get("car_petrol", 0.0)
-                + by_subcategory.get("car_diesel", 0.0)
-            ) * 12 * 0.35,
-            "category":   "transport",
+                by_subcategory.get("car_petrol", 0.0) + by_subcategory.get("car_diesel", 0.0)
+            )
+            * 12
+            * 0.35,
+            "category": "transport",
             "difficulty": "medium",
         },
         {
-            "id":    "switch_to_electric_car",
+            "id": "switch_to_electric_car",
             "condition": (
-                by_subcategory.get("car_petrol", 0.0)
-                + by_subcategory.get("car_diesel", 0.0) > 80
+                by_subcategory.get("car_petrol", 0.0) + by_subcategory.get("car_diesel", 0.0) > 80
             ),
             "title": "Consider switching to an electric vehicle",
             "description_template": (
@@ -217,31 +199,33 @@ async def generate_insights(
                 "An equivalent EV on the {region} grid would cut this by approximately 72%."
             ),
             "saving_kg": (
-                by_subcategory.get("car_petrol", 0.0)
-                + by_subcategory.get("car_diesel", 0.0)
-            ) * 12 * 0.72,
-            "category":   "transport",
+                by_subcategory.get("car_petrol", 0.0) + by_subcategory.get("car_diesel", 0.0)
+            )
+            * 12
+            * 0.72,
+            "category": "transport",
             "difficulty": "hard",
         },
         {
-            "id":    "reduce_flights",
+            "id": "reduce_flights",
             "condition": (
                 by_subcategory.get("flight_domestic", 0.0)
                 + by_subcategory.get("flight_shorthaul", 0.0)
-                + by_subcategory.get("flight_longhaul", 0.0) > 50
+                + by_subcategory.get("flight_longhaul", 0.0)
+                > 50
             ),
             "title": "Replace one short-haul flight with train travel",
             "description_template": (
                 "Aviation accounts for {flight_pct:.0f}% of your logged footprint. "
                 "Swapping a 500 km flight for rail saves around 120 kg CO₂e."
             ),
-            "saving_kg":  120.0,
-            "category":   "transport",
+            "saving_kg": 120.0,
+            "category": "transport",
             "difficulty": "medium",
         },
         # --- FOOD ---
         {
-            "id":    "reduce_beef_weekly",
+            "id": "reduce_beef_weekly",
             "condition": by_subcategory.get("beef", 0.0) > 20,
             "title": "Reduce beef consumption by one meal per week",
             "description_template": (
@@ -250,15 +234,14 @@ async def generate_insights(
                 "around {saving:.0f} kg CO₂e per year."
             ),
             "saving_kg": by_subcategory.get("beef", 0.0) * 12 * 0.25,
-            "category":   "food",
+            "category": "food",
             "difficulty": "easy",
         },
         {
-            "id":    "try_plant_based_day",
+            "id": "try_plant_based_day",
             "condition": (
                 by_category.get("food", 0) > 30
-                and by_subcategory.get("beef", 0.0)
-                + by_subcategory.get("lamb", 0.0) > 15
+                and by_subcategory.get("beef", 0.0) + by_subcategory.get("lamb", 0.0) > 15
             ),
             "title": "Try one plant-based day per week",
             "description_template": (
@@ -266,21 +249,22 @@ async def generate_insights(
                 "One meat-free day per week reduces your food footprint "
                 "by approximately {saving:.0f} kg CO₂e per year."
             ),
-            "saving_kg": (
-                by_subcategory.get("beef", 0.0) + by_subcategory.get("lamb", 0.0)
-            ) * 12 * 0.14,
-            "category":   "food",
+            "saving_kg": (by_subcategory.get("beef", 0.0) + by_subcategory.get("lamb", 0.0))
+            * 12
+            * 0.14,
+            "category": "food",
             "difficulty": "easy",
         },
         # --- ENERGY ---
         {
-            "id":    "switch_green_energy",
+            "id": "switch_green_energy",
             "condition": (
                 by_subcategory.get("electricity_uk", 0.0)
                 + by_subcategory.get("electricity_us", 0.0)
                 + by_subcategory.get("electricity_eu", 0.0)
                 + by_subcategory.get("electricity_in", 0.0)
-                + by_subcategory.get("electricity_au", 0.0) > 15
+                + by_subcategory.get("electricity_au", 0.0)
+                > 15
             ),
             "title": "Switch to a renewable electricity tariff",
             "description_template": (
@@ -291,15 +275,16 @@ async def generate_insights(
             "saving_kg": (
                 by_subcategory.get("electricity_uk", 0.0)
                 + by_subcategory.get("electricity_us", 0.0)
-            ) * 12 * 0.95,
-            "category":   "energy",
+            )
+            * 12
+            * 0.95,
+            "category": "energy",
             "difficulty": "easy",
         },
         {
-            "id":    "reduce_heating",
+            "id": "reduce_heating",
             "condition": (
-                by_subcategory.get("natural_gas", 0.0)
-                + by_subcategory.get("heating_oil", 0.0) > 30
+                by_subcategory.get("natural_gas", 0.0) + by_subcategory.get("heating_oil", 0.0) > 30
             ),
             "title": "Lower thermostat by 1°C",
             "description_template": (
@@ -308,18 +293,18 @@ async def generate_insights(
                 "heating bills and approximately {saving:.0f} kg CO₂e per year."
             ),
             "saving_kg": (
-                by_subcategory.get("natural_gas", 0.0)
-                + by_subcategory.get("heating_oil", 0.0)
-            ) * 12 * 0.08,
-            "category":   "energy",
+                by_subcategory.get("natural_gas", 0.0) + by_subcategory.get("heating_oil", 0.0)
+            )
+            * 12
+            * 0.08,
+            "category": "energy",
             "difficulty": "easy",
         },
         # --- SHOPPING ---
         {
-            "id":    "buy_secondhand",
+            "id": "buy_secondhand",
             "condition": (
-                by_category.get("shopping", 0) > 15
-                and by_subcategory.get("clothing_new", 0.0) > 0
+                by_category.get("shopping", 0) > 15 and by_subcategory.get("clothing_new", 0.0) > 0
             ),
             "title": "Buy second-hand clothing instead of new",
             "description_template": (
@@ -328,12 +313,12 @@ async def generate_insights(
                 "approximately {saving:.0f} kg CO₂e over the next year."
             ),
             "saving_kg": by_subcategory.get("clothing_new", 0.0) * 12 * 0.90,
-            "category":   "shopping",
+            "category": "shopping",
             "difficulty": "easy",
         },
         # --- WASTE ---
         {
-            "id":    "reduce_landfill_waste",
+            "id": "reduce_landfill_waste",
             "condition": by_subcategory.get("landfill", 0.0) > 10,
             "title": "Reduce waste sent to landfill",
             "description_template": (
@@ -342,7 +327,7 @@ async def generate_insights(
                 "recycling more can cut this by approximately {saving:.0f} kg CO₂e per year."
             ),
             "saving_kg": by_subcategory.get("landfill", 0.0) * 12 * 0.40,
-            "category":   "waste",
+            "category": "waste",
             "difficulty": "easy",
         },
     ]
@@ -427,5 +412,5 @@ async def generate_insights(
         monthly_change_percent=round(monthly_change_percent, 1),
         recommendations=recommendations,
         achievements=earned_badges,
-        generated_at=datetime.now(timezone.utc).isoformat(),
+        generated_at=datetime.now(UTC).isoformat(),
     )
