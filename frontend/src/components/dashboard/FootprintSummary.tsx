@@ -1,0 +1,50 @@
+import React from 'react'
+import { formatCarbon } from '../../utils/carbonFormatter'
+import Badge from '../ui/Badge'
+
+interface FootprintSummaryProps {
+  readonly totalCarbonKg: number
+  readonly vsAveragePercent: number
+  readonly monthlyChangePercent: number
+  readonly region: string
+}
+
+/**
+ * Displays the user's total carbon footprint with comparisons to regional averages and monthly change.
+ * @param props - Footprint summary data including total, comparison percentages, and region.
+ * @returns A summary card showing the user's carbon footprint status.
+ */
+const FootprintSummary: React.FC<FootprintSummaryProps> = ({
+  totalCarbonKg,
+  vsAveragePercent,
+  monthlyChangePercent,
+  region,
+}) => {
+  return (
+    <div className="text-center space-y-3">
+      <p className="text-5xl font-bold text-slate-900">{formatCarbon(totalCarbonKg)}</p>
+      <p className="text-slate-500 text-lg">this month</p>
+      <div className="flex items-center justify-center gap-3 flex-wrap">
+        <Badge variant={vsAveragePercent < 0 ? 'success' : 'warning'}>
+          {Math.abs(vsAveragePercent).toFixed(0)}% {vsAveragePercent < 0 ? 'below' : 'above'}{' '}
+          {region} average
+        </Badge>
+        <p className="text-sm text-slate-600">
+          {monthlyChangePercent < 0 ? (
+            <span className="text-green-600 font-medium" aria-label="decreasing trend">
+              <span aria-hidden="true">↓</span> {Math.abs(monthlyChangePercent).toFixed(0)}% vs last
+              month
+            </span>
+          ) : (
+            <span className="text-red-600 font-medium" aria-label="increasing trend">
+              <span aria-hidden="true">↑</span> {Math.abs(monthlyChangePercent).toFixed(0)}% vs last
+              month
+            </span>
+          )}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+export default FootprintSummary
