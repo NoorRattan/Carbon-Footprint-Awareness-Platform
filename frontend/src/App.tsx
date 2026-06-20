@@ -10,8 +10,10 @@ const LogActivity = lazy(() => import('./pages/LogActivity'))
 const Insights = lazy(() => import('./pages/Insights'))
 const Goals = lazy(() => import('./pages/Goals'))
 const Learn = lazy(() => import('./pages/Learn'))
+const ArticleDetail = lazy(() => import('./pages/ArticleDetail'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Login = lazy(() => import('./pages/Login'))
+const Privacy = lazy(() => import('./pages/Privacy'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 /**
@@ -67,7 +69,9 @@ const App: React.FC = () => {
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/learn" element={<Learn />} />
+          <Route path="/learn/:slug" element={<ArticleDetail />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/privacy" element={<Privacy />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />

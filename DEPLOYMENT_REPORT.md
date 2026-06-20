@@ -29,6 +29,8 @@ Generated: 2026-06-20 17:22 IST
 |---|---|---|---|
 | Home | / | PASS | Loads, primary CTAs visible, navigation works |
 | Learn | /learn | PASS | 5 articles visible, filters present, numeric read times shown |
+| Learn Article Details | /learn/:slug | PASS | All 5 article cards open real detail pages without 404s |
+| Privacy Policy | /privacy | PASS | Static privacy policy page loads without 404 |
 | Login | /login | PASS | Google popup opens without CSP errors; email/password auth verified end-to-end with disposable test account |
 | Dashboard | /dashboard | PASS | Authenticated dashboard shows 23.1 kg CO2e, category breakdown, trend, and recommendations |
 | Log Activity | /log | PASS | Transport and food activities logged successfully; recent activities updated |
@@ -57,6 +59,8 @@ Generated: 2026-06-20 17:22 IST
 | BUG-5 | MEDIUM | Required demo activity amounts did not trigger recommendations. | backend/app/services/recommendation_engine.py | Lowered car/beef recommendation thresholds to fire for any logged petrol/diesel car or beef activity. |
 | BUG-6 | MEDIUM | Google Analytics collection requests produced CSP console errors. | frontend/index.html, frontend/src/firebase.ts | Added analytics hosts to connect-src and delayed analytics initialization until consent exists. |
 | BUG-7 | LOW | Traversal-style education path returned 404 after URL normalization instead of the requested 400. | backend/main.py | Added API fallback that returns 400 for suspicious normalized API paths. |
+| BUG-8 | MEDIUM | Learn article cards linked to /learn/:slug routes that rendered the 404 page. | frontend/src/App.tsx, frontend/src/pages/ArticleDetail.tsx | Added a public article detail route that fetches and renders education content by slug. |
+| BUG-9 | LOW | Footer privacy link pointed to a missing /privacy page. | frontend/src/App.tsx, frontend/src/pages/Privacy.tsx, frontend/src/components/layout/Footer.tsx | Added a public privacy policy page and linked it from the footer. |
 
 ## Verification Evidence
 
@@ -70,11 +74,10 @@ Generated: 2026-06-20 17:22 IST
 | Firebase Hosting deploy | PASS - Deploy complete |
 | Final API smoke | PASS - health ok/production, education 5, calculate 4.8, protected endpoints 401 |
 | Final browser flow | PASS - login, dashboard, activity data, insights, goals, profile, sign out, protected redirect |
+| Learn/privacy regression retest | PASS - /learn, all 5 /learn/:slug pages, /privacy, /login, and protected /dashboard redirect; no failed responses or console errors |
 
 ## Known Limitations
 
-- Article detail pages (/learn/slug) show 404 - detail view was out of scope.
-- Privacy policy page shows 404 - static page not built.
 - Rate limiting is per-instance as noted in the README.
 - Google OAuth popup was verified; full Google account login was not completed because no Google credentials were provided. Disposable Firebase email/password auth was used for end-to-end protected flow verification.
 

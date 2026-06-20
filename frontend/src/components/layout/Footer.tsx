@@ -78,6 +78,14 @@ const Footer: React.FC = () => {
                   Goals
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/privacy"
+                  className="text-sm text-slate-500 hover:text-primary transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
