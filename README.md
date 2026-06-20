@@ -6,8 +6,8 @@ emission factors, and AI-powered personalised recommendations.
 
 ## Live Demo
 
-- **App:** https://ecotrack-app-2026.web.app
-- **API Health:** https://ecotrack-api-[hash]-uc.a.run.app/api/v1/health
+- **App:** https://ecotrack-app-2026-1.web.app
+- **API Health:** https://ecotrack-api-qpaqjsc5lq-uc.a.run.app/api/v1/health
 
 ## What It Does
 
