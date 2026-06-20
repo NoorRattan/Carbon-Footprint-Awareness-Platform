@@ -63,7 +63,12 @@ type RawInsight = Omit<
 
 type RawGoal = Omit<
   Goal,
-  'targetReductionPercent' | 'baselineCarbonKg' | 'targetCarbonKg' | 'startDate' | 'endDate' | 'createdAt'
+  | 'targetReductionPercent'
+  | 'baselineCarbonKg'
+  | 'targetCarbonKg'
+  | 'startDate'
+  | 'endDate'
+  | 'createdAt'
 > & {
   target_reduction_percent?: number
   targetReductionPercent?: number
@@ -116,13 +121,14 @@ const mapActivity = (activity: RawActivity): Activity => ({
 
 const mapActivitiesSummary = (summary: RawActivitiesSummary): ActivitiesSummary => ({
   totalCarbonKg: summary.totalCarbonKg ?? summary.total_carbon_kg ?? 0,
-  byCategory: summary.byCategory ?? summary.by_category ?? {
-    transport: 0,
-    food: 0,
-    energy: 0,
-    shopping: 0,
-    waste: 0,
-  },
+  byCategory: summary.byCategory ??
+    summary.by_category ?? {
+      transport: 0,
+      food: 0,
+      energy: 0,
+      shopping: 0,
+      waste: 0,
+    },
   period: summary.period,
 })
 
@@ -263,10 +269,12 @@ export const activitiesApi = {
    * @returns A promise resolving to the list of activities and total count.
    */
   getAll: (params?: ActivityFilterParams): Promise<ActivitiesResponse> =>
-    apiClient.get<{ activities: RawActivity[]; total: number }>('/activities', { params }).then((r) => ({
-      activities: r.data.activities.map(mapActivity),
-      total: r.data.total,
-    })),
+    apiClient
+      .get<{ activities: RawActivity[]; total: number }>('/activities', { params })
+      .then((r) => ({
+        activities: r.data.activities.map(mapActivity),
+        total: r.data.total,
+      })),
 
   /**
    * Logs a new carbon-emitting activity.
@@ -302,7 +310,8 @@ export const insightsApi = {
    * Fetches or triggers regeneration of personalized insights.
    * @returns A promise resolving to the user's carbon footprint insights.
    */
-  get: (): Promise<Insight> => apiClient.get<RawInsight>('/insights').then((r) => mapInsight(r.data)),
+  get: (): Promise<Insight> =>
+    apiClient.get<RawInsight>('/insights').then((r) => mapInsight(r.data)),
 
   /**
    * Acknowledges a specific recommendation to filter it from future lists.

@@ -14,8 +14,8 @@ const Privacy: React.FC = () => {
           <section className="space-y-2">
             <h2 className="text-xl font-semibold text-slate-900">What EcoTrack Collects</h2>
             <p>
-              EcoTrack stores the account details needed to run the service, including your
-              email address, display name, region, diet type, household size, activities, goals,
+              EcoTrack stores the account details needed to run the service, including your email
+              address, display name, region, diet type, household size, activities, goals,
               achievements, and generated carbon insights.
             </p>
           </section>
@@ -32,8 +32,8 @@ const Privacy: React.FC = () => {
           <section className="space-y-2">
             <h2 className="text-xl font-semibold text-slate-900">Authentication</h2>
             <p>
-              Sign-in is handled by Firebase Authentication. EcoTrack uses the Firebase ID token
-              to protect your private activities, goals, insights, and profile endpoints.
+              Sign-in is handled by Firebase Authentication. EcoTrack uses the Firebase ID token to
+              protect your private activities, goals, insights, and profile endpoints.
             </p>
           </section>
 

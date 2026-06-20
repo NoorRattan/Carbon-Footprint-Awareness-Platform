@@ -41,12 +41,19 @@ export function timeAgo(isoDate: string): string {
   return `${years} year${years !== 1 ? 's' : ''} ago`
 }
 
+const toLocalDateString = (date: Date): string => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 /**
  * Returns the ISO date string for the start of today (midnight local time).
  * @returns ISO date string for start of today
  */
 export function startOfToday(): string {
-  return new Date().toISOString().split('T')[0]
+  return toLocalDateString(new Date())
 }
 
 /**
@@ -58,7 +65,7 @@ export function startOfWeek(): string {
   const day = d.getDay()
   const diff = day === 0 ? 6 : day - 1
   d.setDate(d.getDate() - diff)
-  return d.toISOString().split('T')[0]
+  return toLocalDateString(d)
 }
 
 /**
@@ -68,7 +75,7 @@ export function startOfWeek(): string {
 export function startOfMonth(): string {
   const d = new Date()
   d.setDate(1)
-  return d.toISOString().split('T')[0]
+  return toLocalDateString(d)
 }
 
 /**
@@ -98,8 +105,8 @@ export function getDateRange(period: 'week' | 'month' | 'year'): {
   start.setHours(0, 0, 0, 0)
 
   return {
-    start_date: start.toISOString().split('T')[0],
-    end_date: end.toISOString().split('T')[0],
+    start_date: toLocalDateString(start),
+    end_date: toLocalDateString(end),
   }
 }
 
@@ -117,5 +124,5 @@ export function toInputDate(isoDate: string): string {
  * @returns Today's date in YYYY-MM-DD format
  */
 export function todayInputDate(): string {
-  return new Date().toISOString().split('T')[0]
+  return toLocalDateString(new Date())
 }

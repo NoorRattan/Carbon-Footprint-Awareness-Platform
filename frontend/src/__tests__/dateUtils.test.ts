@@ -10,6 +10,9 @@ import {
   todayInputDate,
 } from '../utils/dateUtils'
 
+const dateOnlyPattern = /^\d{4}-\d{2}-\d{2}$/
+const parseDateOnly = (date: string) => new Date(`${date}T00:00:00Z`)
+
 describe('dateUtils', () => {
   describe('formatDate', () => {
     it('formats ISO date to localised display string', () => {
@@ -67,53 +70,47 @@ describe('dateUtils', () => {
   })
 
   describe('startOfToday', () => {
-    it('returns a valid ISO string for today', () => {
+    it('returns today as a YYYY-MM-DD date string', () => {
       const result = startOfToday()
-      expect(result).toContain('T')
-      const parsed = new Date(result)
-      expect(parsed.getHours()).toBe(0)
-      expect(parsed.getMinutes()).toBe(0)
+      expect(result).toMatch(dateOnlyPattern)
     })
   })
 
   describe('startOfWeek', () => {
-    it('returns a valid ISO string', () => {
+    it('returns the week start as a YYYY-MM-DD date string', () => {
       const result = startOfWeek()
-      expect(result).toContain('T')
-      const parsed = new Date(result)
-      expect(parsed.getHours()).toBe(0)
+      expect(result).toMatch(dateOnlyPattern)
     })
   })
 
   describe('startOfMonth', () => {
-    it('returns an ISO string with day set to 1', () => {
+    it('returns a YYYY-MM-DD date string with day set to 1', () => {
       const result = startOfMonth()
-      const parsed = new Date(result)
-      expect(parsed.getDate()).toBe(1)
+      const parsed = parseDateOnly(result)
+      expect(result).toMatch(dateOnlyPattern)
+      expect(parsed.getUTCDate()).toBe(1)
     })
   })
 
   describe('getDateRange', () => {
     it('returns week range with start_date 7 days before end_date', () => {
       const range = getDateRange('week')
-      const start = new Date(range.start_date)
-      const end = new Date(range.end_date)
-      start.setHours(0, 0, 0, 0)
-      end.setHours(0, 0, 0, 0)
+      const start = parseDateOnly(range.start_date)
+      const end = parseDateOnly(range.end_date)
       const diffDays = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
       expect(diffDays).toBe(7)
     })
 
     it('returns month range', () => {
       const range = getDateRange('month')
-      expect(range.start_date).toBeTruthy()
-      expect(range.end_date).toBeTruthy()
+      expect(range.start_date).toMatch(dateOnlyPattern)
+      expect(range.end_date).toMatch(dateOnlyPattern)
     })
 
     it('returns year range', () => {
       const range = getDateRange('year')
-      const start = new Date(range.start_date)
-      const end = new Date(range.end_date)
+      const start = parseDateOnly(range.start_date)
+      const end = parseDateOnly(range.end_date)
       const diffDays = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
       expect(diffDays).toBeGreaterThanOrEqual(364)
     })
@@ -129,7 +126,7 @@ describe('dateUtils', () => {
   describe('todayInputDate', () => {
     it('returns today in YYYY-MM-DD format', () => {
       const result = todayInputDate()
-      expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+      expect(result).toMatch(dateOnlyPattern)
     })
   })
 })
