@@ -17,10 +17,41 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
       - name: Build and deploy to Cloud Run
         run: |
-          gcloud builds submit backend/ \
+          build_id=$(gcloud builds submit backend/ \
             --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/ecotrack-api \
-            --suppress-logs \
-            --project ${{ secrets.GCP_PROJECT_ID }}
+            --async \
+            --format='value(id)' \
+            --project ${{ secrets.GCP_PROJECT_ID }})
+          echo "Cloud Build started: ${build_id}"
+
+          if [ -z "${build_id}" ]; then
+            echo "Cloud Build did not return a build id"
+            exit 1
+          fi
+
+          for attempt in {1..120}; do
+            build_status=$(gcloud builds describe "${build_id}" \
+              --project ${{ secrets.GCP_PROJECT_ID }} \
+              --format='value(status)')
+            echo "Cloud Build status: ${build_status}"
+
+            case "${build_status}" in
+              SUCCESS)
+                break
+                ;;
+              FAILURE|INTERNAL_ERROR|TIMEOUT|CANCELLED|EXPIRED)
+                exit 1
+                ;;
+            esac
+
+            sleep 5
+          done
+
+          if [ "${build_status}" != "SUCCESS" ]; then
+            echo "Cloud Build did not finish before timeout"
+            exit 1
+          fi
+
           gcloud run deploy ecotrack-api \
             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/ecotrack-api \
             --platform managed \
