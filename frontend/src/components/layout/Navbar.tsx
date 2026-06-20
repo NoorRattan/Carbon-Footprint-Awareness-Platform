@@ -2,8 +2,11 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
+/** Navigation item shown in desktop and mobile menus. */
 interface NavItem {
+  /** Link text displayed to the user. */
   readonly label: string
+  /** Router destination path. */
   readonly to: string
 }
 
@@ -30,7 +33,7 @@ const Navbar: React.FC = () => {
      * Closes the user dropdown menu when clicking outside.
      * @param e - The mouse event.
      */
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent): void => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
         setUserMenuOpen(false)
       }
@@ -42,9 +45,19 @@ const Navbar: React.FC = () => {
 
   /**
    * Handles user sign out and closes the dropdown.
+   * @returns A promise that resolves when Firebase sign out completes.
    */
-  const handleSignOut = async () => {
+  const handleSignOut = async (): Promise<void> => {
     setUserMenuOpen(false)
+    await signOut()
+  }
+
+  /**
+   * Handles user sign out from the mobile navigation menu.
+   * @returns A promise that resolves when Firebase sign out completes.
+   */
+  const handleMobileSignOut = async (): Promise<void> => {
+    setMobileMenuOpen(false)
     await signOut()
   }
 
@@ -228,10 +241,7 @@ const Navbar: React.FC = () => {
                   </Link>
                   <button
                     type="button"
-                    onClick={async () => {
-                      setMobileMenuOpen(false)
-                      await signOut()
-                    }}
+                    onClick={handleMobileSignOut}
                     className="block w-full text-left px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50"
                   >
                     Sign Out

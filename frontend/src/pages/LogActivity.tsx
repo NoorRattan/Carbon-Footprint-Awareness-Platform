@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import ActivityForm from '../components/activity/ActivityForm'
 import ActivityList from '../components/activity/ActivityList'
 
@@ -7,13 +7,13 @@ import ActivityList from '../components/activity/ActivityList'
  * @returns The activity logging page with multi-step form and recent activities list.
  */
 const LogActivity: React.FC = () => {
+  const [activityListVersion, setActivityListVersion] = useState(0)
+
   /**
-   * Handles successful activity log by triggering a page-level refresh intent.
-   * The ActivityList component manages its own data fetching on mount.
+   * Remounts the recent activity list after a successful submission.
    */
   const handleSuccess = useCallback(() => {
-    // ActivityList will refetch on next mount; for now a simple no-op
-    // since the form resets itself and shows a success toast
+    setActivityListVersion((version) => version + 1)
   }, [])
 
   return (
@@ -26,7 +26,7 @@ const LogActivity: React.FC = () => {
         <h2 id="recent-heading" className="text-xl font-bold text-slate-800 mb-4">
           Recent Activities
         </h2>
-        <ActivityList />
+        <ActivityList key={activityListVersion} />
       </section>
     </div>
   )

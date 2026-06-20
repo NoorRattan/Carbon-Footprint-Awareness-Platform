@@ -2,11 +2,17 @@ import { useState, useCallback } from 'react'
 import { insightsApi } from '../services/api'
 import type { Insight } from '../types'
 
-interface UseInsightsReturn {
+/** State and actions returned by the useInsights hook. */
+export interface UseInsightsReturn {
+  /** Current personalized insight, or null before loading. */
   readonly insight: Insight | null
+  /** True while insights are being fetched. */
   readonly loading: boolean
+  /** Last insights API error message, if present. */
   readonly error: string | null
+  /** Fetches or regenerates the current insight. */
   readonly fetchInsights: () => Promise<void>
+  /** Acknowledges a recommendation and removes it from local state. */
   readonly acknowledgeRecommendation: (id: string) => Promise<void>
 }
 
@@ -29,7 +35,7 @@ export function useInsights(): UseInsightsReturn {
     try {
       const data = await insightsApi.get()
       setInsight(data)
-    } catch (err) {
+    } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to fetch insights'
       setError(message)
     } finally {
@@ -44,14 +50,20 @@ export function useInsights(): UseInsightsReturn {
    */
   const acknowledgeRecommendation = useCallback(async (id: string): Promise<void> => {
     setError(null)
-    await insightsApi.acknowledge(id)
-    setInsight((prev) => {
-      if (!prev) return prev
-      return {
-        ...prev,
-        recommendations: prev.recommendations.filter((r) => r.id !== id),
-      }
-    })
+    try {
+      await insightsApi.acknowledge(id)
+      setInsight((prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          recommendations: prev.recommendations.filter((r) => r.id !== id),
+        }
+      })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to acknowledge recommendation'
+      setError(message)
+      throw err
+    }
   }, [])
 
   return {

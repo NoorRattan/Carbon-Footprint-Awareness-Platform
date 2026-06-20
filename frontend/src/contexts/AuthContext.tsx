@@ -11,19 +11,41 @@ import {
 import { auth } from '../firebase'
 import { userApi } from '../services/api'
 
+/** Authentication state and actions exposed to the React tree. */
 export interface AuthContextType {
+  /** Current Firebase user, or null when signed out. */
   readonly user: User | null
+  /** True while Firebase resolves the current auth session. */
   readonly loading: boolean
+  /** Starts Google popup sign-in. */
   readonly signInWithGoogle: () => Promise<UserCredential>
+  /** Starts email/password sign-in. */
   readonly signInWithEmail: (email: string, password: string) => Promise<UserCredential>
+  /** Signs the current user out. */
   readonly signOut: () => Promise<void>
+  /** Returns the current Firebase ID token, or null when signed out. */
   readonly getIdToken: () => Promise<string | null>
 }
 
+/** React context containing authentication state and actions. */
 export const AuthContext = createContext<AuthContextType | null>(null)
 
-interface AuthProviderProps {
+/** Props for the AuthProvider component. */
+export interface AuthProviderProps {
+  /** Child React tree that can consume authentication state. */
   readonly children: ReactNode
+}
+
+/**
+ * Synchronizes a Firebase-authenticated user profile without blocking auth state updates.
+ * @returns A promise that resolves after the sync attempt completes.
+ */
+const syncProfileWithoutBlockingAuth = async (): Promise<void> => {
+  try {
+    await userApi.syncProfile()
+  } catch (err: unknown) {
+    void (err instanceof Error ? err.message : err)
+  }
 }
 
 /**
@@ -38,11 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        try {
-          await userApi.syncProfile()
-        } catch {
-          // Silent catch to avoid throwing in effect, profile will be fetched on dashboard mount
-        }
+        await syncProfileWithoutBlockingAuth()
       }
       setUser(currentUser)
       setLoading(false)
@@ -58,11 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signInWithGoogle = async (): Promise<UserCredential> => {
     const provider = new GoogleAuthProvider()
     const credential = await signInWithPopup(auth, provider)
-    try {
-      await userApi.syncProfile()
-    } catch {
-      // Profile sync fallback
-    }
+    await syncProfileWithoutBlockingAuth()
     return credential
   }
 
@@ -74,11 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    */
   const signInWithEmail = async (email: string, password: string): Promise<UserCredential> => {
     const credential = await signInWithEmailAndPassword(auth, email, password)
-    try {
-      await userApi.syncProfile()
-    } catch {
-      // Profile sync fallback
-    }
+    await syncProfileWithoutBlockingAuth()
     return credential
   }
 

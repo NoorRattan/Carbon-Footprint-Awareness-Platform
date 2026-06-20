@@ -1,6 +1,10 @@
 import React from 'react'
 import Card from '../components/ui/Card'
 
+/**
+ * Public privacy policy page explaining data collection, analytics, authentication, and deletion.
+ * @returns The privacy policy page content.
+ */
 const Privacy: React.FC = () => {
   return (
     <div className="max-w-3xl mx-auto space-y-8">

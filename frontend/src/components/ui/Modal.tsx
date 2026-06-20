@@ -1,11 +1,17 @@
 import React, { useEffect, useRef, useCallback } from 'react'
 import ReactDOM from 'react-dom'
 
-interface ModalProps {
+/** Props for the Modal component. */
+export interface ModalProps {
+  /** Whether the modal is visible. */
   readonly isOpen: boolean
+  /** Callback invoked when the modal should close. */
   readonly onClose: () => void
+  /** Modal title used for the heading and accessible name. */
   readonly title: string
+  /** Modal body contents. */
   readonly children: React.ReactNode
+  /** Maximum modal width variant. */
   readonly size?: 'sm' | 'md' | 'lg'
 }
 
@@ -96,7 +102,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, size = 
    * Handles clicks on the overlay background to close the modal.
    * @param e - The mouse event.
    */
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>): void => {
     if (e.target === overlayRef.current) {
       onClose()
     }

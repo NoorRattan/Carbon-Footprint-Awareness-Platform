@@ -6,16 +6,21 @@ import Badge from '../ui/Badge'
 import Button from '../ui/Button'
 import ProgressBar from '../ui/ProgressBar'
 import type { Goal, GoalCategory, GoalStatus } from '../../types'
+import type { BadgeVariant } from '../ui/Badge'
 
-interface GoalCardProps {
+/** Props for the GoalCard component. */
+export interface GoalCardProps {
+  /** Goal record to display. */
   readonly goal: Goal
+  /** Current carbon footprint in kg CO2e for the goal category. */
   readonly currentCarbonKg: number
+  /** Callback invoked when the user deletes the goal. */
   readonly onDelete: (id: string) => void
 }
 
 /** Maps goal status to badge variants. */
-const STATUS_VARIANT: Record<GoalStatus, 'success' | 'warning' | 'error'> = {
-  active: 'info' as 'warning',
+const STATUS_VARIANT: Record<GoalStatus, BadgeVariant> = {
+  active: 'info',
   completed: 'success',
   failed: 'error',
 }
@@ -42,8 +47,6 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, currentCarbonKg, onDelete }) 
     Math.ceil((new Date(goal.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
   )
 
-  const statusVariant = goal.status === 'active' ? 'info' : STATUS_VARIANT[goal.status]
-
   return (
     <Card hoverable className="relative">
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -51,7 +54,7 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, currentCarbonKg, onDelete }) 
           <h3 className="text-base font-semibold text-slate-800 truncate">{goal.title}</h3>
           <div className="flex items-center gap-2 mt-1">
             <Badge variant="neutral">{getCategoryLabel(goal.category)}</Badge>
-            <Badge variant={statusVariant}>{goal.status}</Badge>
+            <Badge variant={STATUS_VARIANT[goal.status]}>{goal.status}</Badge>
           </div>
         </div>
         <Button

@@ -1,3 +1,4 @@
+import { CATEGORY_CONFIG } from './categoryConfig'
 import type { ActivityCategory } from '../types/activity'
 
 /**
@@ -28,14 +29,7 @@ export function formatImpact(kg: number): string {
  * @returns Tailwind bg class string
  */
 export function getCategoryColor(category: ActivityCategory): string {
-  const map: Record<ActivityCategory, string> = {
-    transport: 'bg-blue-500',
-    food: 'bg-green-500',
-    energy: 'bg-amber-500',
-    shopping: 'bg-purple-500',
-    waste: 'bg-slate-500',
-  }
-  return map[category]
+  return CATEGORY_CONFIG[category].color
 }
 
 /**
@@ -44,12 +38,5 @@ export function getCategoryColor(category: ActivityCategory): string {
  * @returns Emoji string
  */
 export function getCategoryIcon(category: ActivityCategory): string {
-  const map: Record<ActivityCategory, string> = {
-    transport: '🚗',
-    food: '🍽️',
-    energy: '⚡',
-    shopping: '🛍️',
-    waste: '♻️',
-  }
-  return map[category]
+  return CATEGORY_CONFIG[category].icon
 }

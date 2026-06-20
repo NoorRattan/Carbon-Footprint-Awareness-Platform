@@ -1,17 +1,30 @@
 import React from 'react'
 
-interface InputProps {
+/** Props for the Input component. */
+export interface InputProps {
+  /** Unique input id paired with the visible label. */
   readonly id: string
+  /** Visible label text. */
   readonly label: string
+  /** Native input type. */
   readonly type?: 'text' | 'email' | 'password' | 'number' | 'date' | 'tel' | 'url'
+  /** Controlled input value. */
   readonly value: string
+  /** Change handler for controlled input updates. */
   readonly onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  /** Optional placeholder text. */
   readonly placeholder?: string
+  /** Validation error message displayed below the field. */
   readonly error?: string
+  /** Whether the field is disabled. */
   readonly disabled?: boolean
+  /** Whether the field is required. */
   readonly required?: boolean
+  /** Additional help text displayed below the field. */
   readonly helpText?: string
+  /** Unit or suffix displayed inside the input. */
   readonly suffix?: string
+  /** Optional wrapper class names. */
   readonly className?: string
 }
 

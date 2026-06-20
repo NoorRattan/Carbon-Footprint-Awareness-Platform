@@ -20,6 +20,7 @@ import {
   EducationArticle,
   CarbonCalculateRequest,
   CarbonCalculateResponse,
+  ACTIVITY_CATEGORIES,
 } from '../types'
 
 type RawActivity = Omit<Activity, 'userId' | 'carbonKg' | 'createdAt'> & {
@@ -106,6 +107,16 @@ type RawEducationArticle = Omit<EducationArticle, 'content' | 'readTime' | 'upda
   updatedAt?: string
 }
 
+const DEFAULT_ACTIVITY_CATEGORY = ACTIVITY_CATEGORIES[0]
+
+const EMPTY_CATEGORY_TOTALS = ACTIVITY_CATEGORIES.reduce<ActivitiesSummary['byCategory']>(
+  (totals, category) => ({
+    ...totals,
+    [category]: 0,
+  }),
+  {} as ActivitiesSummary['byCategory']
+)
+
 const mapActivity = (activity: RawActivity): Activity => ({
   id: activity.id,
   userId: activity.userId ?? activity.user_id ?? '',
@@ -121,14 +132,7 @@ const mapActivity = (activity: RawActivity): Activity => ({
 
 const mapActivitiesSummary = (summary: RawActivitiesSummary): ActivitiesSummary => ({
   totalCarbonKg: summary.totalCarbonKg ?? summary.total_carbon_kg ?? 0,
-  byCategory: summary.byCategory ??
-    summary.by_category ?? {
-      transport: 0,
-      food: 0,
-      energy: 0,
-      shopping: 0,
-      waste: 0,
-    },
+  byCategory: summary.byCategory ?? summary.by_category ?? EMPTY_CATEGORY_TOTALS,
   period: summary.period,
 })
 
@@ -144,7 +148,7 @@ const mapRecommendation = (recommendation: RawRecommendation): Recommendation =>
 const mapInsight = (insight: RawInsight): Insight => ({
   footprintKg: insight.footprintKg ?? insight.footprint_kg ?? 0,
   vsAveragePercent: insight.vsAveragePercent ?? insight.vs_average_percent ?? 0,
-  topCategory: insight.topCategory ?? insight.top_category ?? 'transport',
+  topCategory: insight.topCategory ?? insight.top_category ?? DEFAULT_ACTIVITY_CATEGORY,
   monthlyChangePercent: insight.monthlyChangePercent ?? insight.monthly_change_percent ?? 0,
   recommendations: (insight.recommendations ?? []).map(mapRecommendation),
   achievements: insight.achievements ?? [],

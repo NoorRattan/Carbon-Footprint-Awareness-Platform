@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom'
 import { educationApi } from '../services/api'
 import Card from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
-import type { EducationArticle } from '../types'
+import { ACTIVITY_CATEGORIES, type EducationArticle } from '../types'
 
 /** Category filter options for education articles. */
-const FILTER_CATEGORIES = ['all', 'transport', 'food', 'energy', 'shopping', 'waste'] as const
+const FILTER_CATEGORIES = ['all', ...ACTIVITY_CATEGORIES] as const
+
+/** Article category filter option shown in the Learn page tabs. */
+type ArticleCategoryFilter = (typeof FILTER_CATEGORIES)[number]
 
 /**
  * Public learn page displaying educational articles about carbon footprint reduction.
@@ -17,10 +20,10 @@ const Learn: React.FC = () => {
   const [articles, setArticles] = useState<Omit<EducationArticle, 'content'>[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeFilter, setActiveFilter] = useState<string>('all')
+  const [activeFilter, setActiveFilter] = useState<ArticleCategoryFilter>('all')
 
   useEffect(() => {
-    const fetchArticles = async () => {
+    const fetchArticles = async (): Promise<void> => {
       setLoading(true)
       setError(null)
       try {
@@ -28,7 +31,7 @@ const Learn: React.FC = () => {
           activeFilter === 'all' ? undefined : activeFilter
         )
         setArticles(response.articles)
-      } catch (err) {
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to load articles'
         setError(message)
       } finally {

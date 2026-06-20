@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { UserProvider, UserContext } from '../contexts/UserContext'
 import { userApi } from '../services/api'
 import { AuthContext } from '../contexts/AuthContext'
 import { useContext } from 'react'
+import type { User } from 'firebase/auth'
 
 vi.mock('../firebase', () => ({
   auth: { currentUser: null, signOut: vi.fn(), getIdToken: vi.fn() },
@@ -28,6 +28,13 @@ vi.mock('../services/api', () => ({
   },
 }))
 
+const mockUser = {
+  uid: '123',
+  email: 'test@example.com',
+  displayName: 'Test User',
+  photoURL: null,
+} as unknown as User
+
 const TestComponent = () => {
   const context = useContext(UserContext)
   if (!context) return null
@@ -47,7 +54,7 @@ describe('UserContext', () => {
     render(
       <AuthContext.Provider
         value={{
-          user: { uid: '123' } as any,
+          user: mockUser,
           loading: false,
           signInWithGoogle: vi.fn(),
           signInWithEmail: vi.fn(),

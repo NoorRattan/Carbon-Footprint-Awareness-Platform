@@ -18,7 +18,7 @@ const ActivityList: React.FC = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchRecent = async () => {
+    const fetchRecent = async (): Promise<void> => {
       setLoading(true)
       setError(null)
       try {
@@ -31,7 +31,7 @@ const ActivityList: React.FC = () => {
           end_date: new Date().toISOString().split('T')[0],
         })
         setActivities(response.activities)
-      } catch (err) {
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to load activities'
         setError(message)
       } finally {
@@ -45,12 +45,12 @@ const ActivityList: React.FC = () => {
    * Handles deleting an activity by ID.
    * @param id - The activity ID to delete.
    */
-  const handleDelete = useCallback(async (id: string) => {
+  const handleDelete = useCallback(async (id: string): Promise<void> => {
     setDeletingId(id)
     try {
       await activitiesApi.delete(id)
       setActivities((prev) => prev.filter((a) => a.id !== id))
-    } catch (err) {
+    } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to delete activity'
       setError(message)
     } finally {

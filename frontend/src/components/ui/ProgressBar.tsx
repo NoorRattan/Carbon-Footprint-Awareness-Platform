@@ -1,11 +1,18 @@
 import React from 'react'
 
-interface ProgressBarProps {
+/** Props for the ProgressBar component. */
+export interface ProgressBarProps {
+  /** Current progress value. */
   readonly value: number
+  /** Maximum progress value. */
   readonly max: number
+  /** Accessible progress label. */
   readonly label: string
+  /** Whether to display the computed percentage text. */
   readonly showPercentage?: boolean
+  /** Tailwind background class used for the filled bar. */
   readonly color?: string
+  /** Optional additional wrapper class names. */
   readonly className?: string
 }
 

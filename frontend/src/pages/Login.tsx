@@ -21,14 +21,15 @@ const Login: React.FC = () => {
 
   /**
    * Handles Google sign-in via popup.
+   * @returns A promise that resolves after successful navigation or error handling.
    */
-  const handleGoogleSignIn = useCallback(async () => {
+  const handleGoogleSignIn = useCallback(async (): Promise<void> => {
     setError(null)
     setGoogleLoading(true)
     try {
       await signInWithGoogle()
       navigate('/dashboard')
-    } catch (err) {
+    } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Google sign-in failed'
       setError(message)
     } finally {
@@ -41,14 +42,14 @@ const Login: React.FC = () => {
    * @param e - The form submit event.
    */
   const handleEmailSignIn = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: React.FormEvent): Promise<void> => {
       e.preventDefault()
       setError(null)
       setEmailLoading(true)
       try {
         await signInWithEmail(email, password)
         navigate('/dashboard')
-      } catch (err) {
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Sign-in failed'
         setError(message)
       } finally {

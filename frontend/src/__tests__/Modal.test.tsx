@@ -66,6 +66,20 @@ describe('Modal', () => {
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 
+  it('overlay click calls onClose', async () => {
+    const user = userEvent.setup()
+    const onClose = vi.fn()
+    render(
+      <Modal isOpen={true} onClose={onClose} title="Overlay Test">
+        <p>Content</p>
+      </Modal>
+    )
+
+    await user.click(screen.getByRole('presentation'))
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
   it('Escape key calls onClose', async () => {
     const user = userEvent.setup()
     const onClose = vi.fn()
@@ -76,5 +90,29 @@ describe('Modal', () => {
     )
     await user.keyboard('{Escape}')
     expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps keyboard focus inside the dialog', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal isOpen={true} onClose={vi.fn()} title="Focus Test">
+        <button type="button">First action</button>
+        <button type="button">Last action</button>
+      </Modal>
+    )
+
+    const closeButton = screen.getByRole('button', { name: /close dialog/i })
+    const firstAction = screen.getByRole('button', { name: /first action/i })
+    const lastAction = screen.getByRole('button', { name: /last action/i })
+
+    closeButton.focus()
+    await user.tab({ shift: true })
+    expect(lastAction).toHaveFocus()
+
+    await user.tab()
+    expect(closeButton).toHaveFocus()
+
+    await user.tab()
+    expect(firstAction).toHaveFocus()
   })
 })

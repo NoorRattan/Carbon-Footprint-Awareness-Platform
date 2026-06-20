@@ -9,14 +9,16 @@ import { carbonApi, activitiesApi } from '../../services/api'
 import { formatCarbon } from '../../utils/carbonFormatter'
 import { todayInputDate } from '../../utils/dateUtils'
 import Button from '../ui/Button'
-import type { ActivityCategory } from '../../types'
+import { ACTIVITY_CATEGORIES, type ActivityCategory } from '../../types'
 
-interface ActivityFormProps {
+/** Props for the ActivityForm component. */
+export interface ActivityFormProps {
+  /** Callback invoked after a successful activity submission. */
   readonly onSuccess: () => void
 }
 
-/** Ordered list of categories with Transport first as default highlight. */
-const CATEGORIES: ActivityCategory[] = ['transport', 'food', 'energy', 'shopping', 'waste']
+/** Default category selected when the activity form resets. */
+const DEFAULT_ACTIVITY_CATEGORY: ActivityCategory = ACTIVITY_CATEGORIES[0]
 
 /**
  * Multi-step activity logging form. Steps: category, subcategory, amount (with live CO₂ estimate), date, and optional notes.
@@ -25,7 +27,7 @@ const CATEGORIES: ActivityCategory[] = ['transport', 'food', 'energy', 'shopping
  */
 const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
   const [step, setStep] = useState(1)
-  const [category, setCategory] = useState<ActivityCategory>('transport')
+  const [category, setCategory] = useState<ActivityCategory>(DEFAULT_ACTIVITY_CATEGORY)
   const [subcategory, setSubcategory] = useState('')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(todayInputDate())
@@ -54,7 +56,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
       return
     }
 
-    const timer = setTimeout(async () => {
+    const updateEstimate = async (): Promise<void> => {
       setEstimateLoading(true)
       try {
         const result = await carbonApi.calculate({
@@ -63,11 +65,16 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
           amount: parseFloat(amount),
         })
         setEstimate(result.carbon_kg)
-      } catch {
+      } catch (err: unknown) {
+        void (err instanceof Error ? err.message : err)
         setEstimate(null)
       } finally {
         setEstimateLoading(false)
       }
+    }
+
+    const timer = setTimeout(() => {
+      void updateEstimate()
     }, 400)
 
     return () => clearTimeout(timer)
@@ -78,7 +85,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
    * @param e - The form submit event.
    */
   const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: React.FormEvent): Promise<void> => {
       e.preventDefault()
       setError(null)
       setSubmitting(true)
@@ -95,15 +102,15 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
         setTimeout(() => {
           setSuccessMessage(null)
           setStep(1)
-          setCategory('transport')
-          setSubcategory(getSubcategoriesForCategory('transport')[0] || '')
+          setCategory(DEFAULT_ACTIVITY_CATEGORY)
+          setSubcategory(getSubcategoriesForCategory(DEFAULT_ACTIVITY_CATEGORY)[0] || '')
           setAmount('')
           setDate(todayInputDate())
           setNotes('')
           setEstimate(null)
           onSuccess()
         }, 1500)
-      } catch (err) {
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to log activity'
         setError(message)
       } finally {
@@ -136,7 +143,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
             What type of activity?
           </legend>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {CATEGORIES.map((cat) => {
+            {ACTIVITY_CATEGORIES.map((cat) => {
               const config = CATEGORY_CONFIG[cat]
               const icon = getCategoryIcon(cat)
               return (
@@ -285,7 +292,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
       {/* Step 5: Notes (optional) & Submit */}
       {step === 5 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-slate-800">Any notes? (optional)</h3>
+          <h3 className="text-lg font-semibold text-slate-800">Notes? (optional)</h3>
           <div>
             <label htmlFor="notes-input" className="block text-sm font-medium text-slate-700 mb-1">
               Notes
@@ -296,7 +303,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
               onChange={(e) => setNotes(e.target.value)}
               maxLength={200}
               rows={3}
-              placeholder="Add any additional details..."
+              placeholder="Add optional details..."
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-none"
             />
             <p className="text-xs text-slate-400 mt-1">{notes.length}/200 characters</p>

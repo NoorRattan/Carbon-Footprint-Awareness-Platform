@@ -11,6 +11,7 @@ import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import { insightsApi } from '../services/api'
 import type { Recommendation } from '../types'
+import type { MonthlyDataPoint } from '../components/dashboard/MonthlyTrend'
 
 /**
  * Protected dashboard page showing the user's carbon footprint overview, trends,
@@ -49,12 +50,12 @@ const Dashboard: React.FC = () => {
    * Acknowledges a recommendation and removes it from the dashboard preview.
    * @param id - The recommendation ID to acknowledge.
    */
-  const handleAcknowledge = useCallback(async (id: string) => {
+  const handleAcknowledge = useCallback(async (id: string): Promise<void> => {
     try {
       await insightsApi.acknowledge(id)
       setLocalRecs((prev) => prev.filter((r) => r.id !== id))
-    } catch {
-      // Silently handle — user can retry from insights page
+    } catch (err: unknown) {
+      void (err instanceof Error ? err.message : err)
     }
   }, [])
 
@@ -73,8 +74,8 @@ const Dashboard: React.FC = () => {
   const streak = insight?.achievements?.length ?? 0
 
   /** Generate mock monthly trend data from summary. */
-  const monthlyTrendData = useMemo(() => {
-    const months: { month: string; carbonKg: number }[] = []
+  const monthlyTrendData = useMemo<MonthlyDataPoint[]>(() => {
+    const months: MonthlyDataPoint[] = []
     const now = new Date()
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1)

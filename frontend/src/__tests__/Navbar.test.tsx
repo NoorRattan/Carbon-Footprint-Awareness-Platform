@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -8,6 +7,7 @@ import { UserProvider } from '../contexts/UserContext'
 import Navbar from '../components/layout/Navbar'
 import React from 'react'
 import * as authHook from '../hooks/useAuth'
+import type { User } from 'firebase/auth'
 
 vi.mock('../firebase', () => ({
   auth: { currentUser: null, signOut: vi.fn(), getIdToken: vi.fn() },
@@ -43,6 +43,13 @@ vi.mock('../services/api', () => ({
 
 // We need to spy on useAuth to return different users
 const useAuthSpy = vi.spyOn(authHook, 'useAuth')
+
+const mockUser = {
+  uid: '123',
+  email: 'test@example.com',
+  displayName: 'Test User',
+  photoURL: null,
+} as unknown as User
 
 function renderWithProviders(ui: React.ReactElement) {
   return render(
@@ -88,7 +95,7 @@ describe('Navbar', () => {
 
   it('shows user menu button when user is logged in', () => {
     useAuthSpy.mockReturnValue({
-      user: { uid: '123', email: 'test@example.com', displayName: 'Test User' } as any,
+      user: mockUser,
       loading: false,
       signInWithGoogle: vi.fn(),
       signInWithEmail: vi.fn(),
@@ -104,7 +111,7 @@ describe('Navbar', () => {
   it('opens user menu when user button is clicked', async () => {
     const user = userEvent.setup()
     useAuthSpy.mockReturnValue({
-      user: { uid: '123', email: 'test@example.com', displayName: 'Test User' } as any,
+      user: mockUser,
       loading: false,
       signInWithGoogle: vi.fn(),
       signInWithEmail: vi.fn(),
@@ -125,7 +132,7 @@ describe('Navbar', () => {
     const user = userEvent.setup()
     const mockSignOut = vi.fn().mockResolvedValue(undefined)
     useAuthSpy.mockReturnValue({
-      user: { uid: '123', email: 'test@example.com', displayName: 'Test User' } as any,
+      user: mockUser,
       loading: false,
       signInWithGoogle: vi.fn(),
       signInWithEmail: vi.fn(),

@@ -21,6 +21,12 @@ vi.mock('firebase/auth', () => ({
   signOut: vi.fn().mockResolvedValue(undefined),
 }))
 
+vi.mock('../services/api', () => ({
+  userApi: {
+    syncProfile: vi.fn().mockResolvedValue(undefined),
+  },
+}))
+
 const TestComponent = () => {
   const { user, signInWithGoogle, signInWithEmail, signOut: contextSignOut } = useAuth()
 

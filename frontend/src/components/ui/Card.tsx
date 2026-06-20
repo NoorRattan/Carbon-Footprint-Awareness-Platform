@@ -1,9 +1,14 @@
 import React from 'react'
 
-interface CardProps {
+/** Props for the Card component. */
+export interface CardProps {
+  /** Card body contents. */
   readonly children: React.ReactNode
+  /** Optional additional class names for the card wrapper. */
   readonly className?: string
+  /** Padding density for the card content. */
   readonly padding?: 'none' | 'sm' | 'md' | 'lg'
+  /** Whether hover shadow styles are enabled. */
   readonly hoverable?: boolean
 }
 

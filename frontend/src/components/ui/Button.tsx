@@ -1,16 +1,28 @@
 import React from 'react'
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
-type ButtonSize = 'sm' | 'md' | 'lg'
+/** Visual style variants supported by the Button component. */
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
 
-interface ButtonProps {
+/** Size variants supported by the Button component. */
+export type ButtonSize = 'sm' | 'md' | 'lg'
+
+/** Props for the Button component. */
+export interface ButtonProps {
+  /** The visual style variant of the button. */
   readonly variant?: ButtonVariant
+  /** The size of the button. */
   readonly size?: ButtonSize
+  /** Whether to show the loading spinner and disable interaction. */
   readonly loading?: boolean
+  /** Whether the button is disabled. */
   readonly disabled?: boolean
+  /** Click handler for button activation. */
   readonly onClick?: () => void
+  /** Button contents. */
   readonly children: React.ReactNode
+  /** Native button type attribute. */
   readonly type?: 'button' | 'submit' | 'reset'
+  /** Accessible label used when visible text is not descriptive enough. */
   readonly ariaLabel?: string
 }
 

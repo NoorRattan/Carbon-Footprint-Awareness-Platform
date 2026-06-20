@@ -2,10 +2,15 @@ import React from 'react'
 import { formatCarbon } from '../../utils/carbonFormatter'
 import Badge from '../ui/Badge'
 
-interface FootprintSummaryProps {
+/** Props for the FootprintSummary component. */
+export interface FootprintSummaryProps {
+  /** Total carbon footprint in kg CO2e for the current period. */
   readonly totalCarbonKg: number
+  /** Percentage difference versus regional average, where negative means below average. */
   readonly vsAveragePercent: number
+  /** Month-over-month change percentage, where negative means improvement. */
   readonly monthlyChangePercent: number
+  /** Region label used in average comparison text. */
   readonly region: string
 }
 

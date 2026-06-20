@@ -48,6 +48,7 @@ describe('MonthlyTrend', () => {
     render(<MonthlyTrend data={data} />)
     expect(screen.getByRole('img', { name: 'Monthly carbon footprint trend' })).toBeInTheDocument()
     expect(screen.getByTestId('line-chart')).toBeInTheDocument()
+    expect(screen.getByRole('table', { hidden: true })).toHaveTextContent('100.0 kg CO₂e')
   })
 
   it('renders empty state message when data is empty', () => {

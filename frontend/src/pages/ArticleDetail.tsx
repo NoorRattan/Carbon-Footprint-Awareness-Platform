@@ -5,11 +5,16 @@ import Badge from '../components/ui/Badge'
 import Card from '../components/ui/Card'
 import type { EducationArticle } from '../types'
 
+/**
+ * Converts simple markdown-like article content into React nodes for display.
+ * @param content - Article content using heading and list markers.
+ * @returns Renderable React nodes for the article body.
+ */
 const renderArticleContent = (content: string): React.ReactNode[] => {
   const listItems: string[] = []
   const nodes: React.ReactNode[] = []
 
-  const flushList = () => {
+  const flushList = (): void => {
     if (listItems.length === 0) return
     nodes.push(
       <ul key={`list-${nodes.length}`} className="list-disc pl-6 space-y-2 text-slate-700">
@@ -75,6 +80,10 @@ const renderArticleContent = (content: string): React.ReactNode[] => {
   return nodes
 }
 
+/**
+ * Public article detail page for a single educational article.
+ * @returns The article detail view or a loading/not-found state.
+ */
 const ArticleDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
   const [article, setArticle] = useState<EducationArticle | null>(null)
@@ -82,7 +91,7 @@ const ArticleDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchArticle = async () => {
+    const fetchArticle = async (): Promise<void> => {
       if (!slug) {
         setError('Article not found')
         setLoading(false)
@@ -94,7 +103,8 @@ const ArticleDetail: React.FC = () => {
       try {
         const data = await educationApi.getBySlug(slug)
         setArticle(data)
-      } catch {
+      } catch (err: unknown) {
+        void (err instanceof Error ? err.message : err)
         setError('Article not found')
       } finally {
         setLoading(false)

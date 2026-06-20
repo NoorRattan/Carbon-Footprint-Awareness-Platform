@@ -8,8 +8,26 @@ import Card from '../components/ui/Card'
 import Modal from '../components/ui/Modal'
 import type { UserProfile, UserRegion, DietType } from '../types'
 
+/** Select option model for profile fields. */
+interface ProfileOption<TValue extends string> {
+  /** Stored option value. */
+  readonly value: TValue
+  /** Human-readable option label. */
+  readonly label: string
+}
+
+/** Achievement badge shown on the profile page. */
+interface AchievementBadge {
+  /** Badge identifier from the backend profile. */
+  readonly id: string
+  /** Human-readable badge label. */
+  readonly label: string
+  /** Decorative badge icon. */
+  readonly icon: string
+}
+
 /** All supported region options. */
-const REGIONS: { value: UserRegion; label: string }[] = [
+const REGIONS: ProfileOption<UserRegion>[] = [
   { value: 'UK', label: 'United Kingdom' },
   { value: 'US', label: 'United States' },
   { value: 'EU', label: 'European Union' },
@@ -19,7 +37,7 @@ const REGIONS: { value: UserRegion; label: string }[] = [
 ]
 
 /** All supported diet types. */
-const DIET_TYPES: { value: DietType; label: string }[] = [
+const DIET_TYPES: ProfileOption<DietType>[] = [
   { value: 'meat-heavy', label: 'Meat-heavy' },
   { value: 'average', label: 'Average' },
   { value: 'vegetarian', label: 'Vegetarian' },
@@ -27,7 +45,7 @@ const DIET_TYPES: { value: DietType; label: string }[] = [
 ]
 
 /** Badge definitions for achievements display. */
-const ALL_BADGES = [
+const ALL_BADGES: AchievementBadge[] = [
   { id: 'first_log', label: 'First Log', icon: '📝' },
   { id: 'week_streak', label: '7-Day Streak', icon: '🔥' },
   { id: 'month_streak', label: '30-Day Streak', icon: '⭐' },
@@ -61,7 +79,7 @@ const Profile: React.FC = () => {
   const [householdSize, setHouseholdSize] = useState('1')
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchProfile = async (): Promise<void> => {
       setLoading(true)
       setError(null)
       try {
@@ -71,7 +89,7 @@ const Profile: React.FC = () => {
         setRegion(data.region)
         setDietType(data.dietType)
         setHouseholdSize(String(data.householdSize))
-      } catch (err) {
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to load profile'
         setError(message)
       } finally {
@@ -83,8 +101,9 @@ const Profile: React.FC = () => {
 
   /**
    * Saves updated profile fields to the API.
+   * @returns A promise that resolves when the profile save completes.
    */
-  const handleSave = useCallback(async () => {
+  const handleSave = useCallback(async (): Promise<void> => {
     setSaving(true)
     setSaveMessage(null)
     try {
@@ -96,7 +115,7 @@ const Profile: React.FC = () => {
       })
       setSaveMessage('Profile saved successfully!')
       setTimeout(() => setSaveMessage(null), 3000)
-    } catch (err) {
+    } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to save profile'
       setError(message)
     } finally {
@@ -106,14 +125,15 @@ const Profile: React.FC = () => {
 
   /**
    * Handles permanent account deletion with Firebase sign-out and redirect.
+   * @returns A promise that resolves when account deletion completes.
    */
-  const handleDeleteAccount = useCallback(async () => {
+  const handleDeleteAccount = useCallback(async (): Promise<void> => {
     setDeleting(true)
     try {
       await userApi.deleteAccount()
       await auth.signOut()
       navigate('/')
-    } catch (err) {
+    } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to delete account'
       setError(message)
       setDeleting(false)

@@ -4,16 +4,24 @@ import { auth } from '../firebase'
 import { userApi } from '../services/api'
 import { UserProfile, UserProfileUpdateRequest } from '../types'
 
+/** User profile state and profile mutation actions exposed to the React tree. */
 export interface UserContextType {
+  /** Current backend profile for the signed-in user. */
   readonly userProfile: UserProfile | null
+  /** True while profile data is being loaded. */
   readonly loading: boolean
+  /** Refetches the current user profile from the backend. */
   readonly refreshProfile: () => Promise<void>
+  /** Updates editable profile fields and refreshes local state. */
   readonly updateProfile: (data: UserProfileUpdateRequest) => Promise<void>
 }
 
+/** React context containing backend user profile state and actions. */
 export const UserContext = createContext<UserContextType | null>(null)
 
-interface UserProviderProps {
+/** Props for the UserProvider component. */
+export interface UserProviderProps {
+  /** Child React tree that can consume profile state. */
   readonly children: ReactNode
 }
 
@@ -35,7 +43,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     try {
       const profile = await userApi.getProfile()
       setUserProfile(profile)
-    } catch {
+    } catch (err: unknown) {
+      void (err instanceof Error ? err.message : err)
       setUserProfile(null)
     } finally {
       setLoading(false)

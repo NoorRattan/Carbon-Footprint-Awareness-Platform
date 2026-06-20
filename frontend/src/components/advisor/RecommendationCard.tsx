@@ -4,14 +4,18 @@ import Badge from '../ui/Badge'
 import Button from '../ui/Button'
 import Card from '../ui/Card'
 import type { Recommendation, Difficulty } from '../../types'
+import type { BadgeVariant } from '../ui/Badge'
 
-interface RecommendationCardProps {
+/** Props for the RecommendationCard component. */
+export interface RecommendationCardProps {
+  /** Recommendation to render. */
   readonly recommendation: Recommendation
+  /** Callback invoked when the user marks the recommendation as done. */
   readonly onAcknowledge: (id: string) => void
 }
 
 /** Maps difficulty levels to badge variant styles. */
-const DIFFICULTY_VARIANTS: Record<Difficulty, 'success' | 'warning' | 'error'> = {
+const DIFFICULTY_VARIANTS: Record<Difficulty, BadgeVariant> = {
   easy: 'success',
   medium: 'warning',
   hard: 'error',

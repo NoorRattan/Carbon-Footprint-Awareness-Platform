@@ -5,17 +5,10 @@ import GoalCard from '../components/goals/GoalCard'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import { CATEGORY_CONFIG } from '../utils/categoryConfig'
-import type { ActivityCategory, GoalCategory } from '../types'
+import { ACTIVITY_CATEGORIES, type GoalCategory } from '../types'
 
 /** All categories available for goal setting, including 'total'. */
-const GOAL_CATEGORIES: GoalCategory[] = [
-  'total',
-  'transport',
-  'food',
-  'energy',
-  'shopping',
-  'waste',
-]
+const GOAL_CATEGORIES: GoalCategory[] = ['total', ...ACTIVITY_CATEGORIES]
 
 /**
  * Protected goals page for viewing active carbon reduction goals and creating new ones.
@@ -53,7 +46,7 @@ const Goals: React.FC = () => {
    * @param e - The form submit event.
    */
   const handleCreate = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: React.FormEvent): Promise<void> => {
       e.preventDefault()
       if (!title.trim() || !endDate) {
         setFormError('Please fill in all required fields.')
@@ -73,7 +66,7 @@ const Goals: React.FC = () => {
         setGoalCategory('total')
         setReduction(20)
         setEndDate('')
-      } catch (err) {
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to create goal'
         setFormError(message)
       } finally {
@@ -88,11 +81,11 @@ const Goals: React.FC = () => {
    * @param id - The goal ID to delete.
    */
   const handleDelete = useCallback(
-    async (id: string) => {
+    async (id: string): Promise<void> => {
       try {
         await deleteGoal(id)
-      } catch {
-        // Error is managed by the hook
+      } catch (err: unknown) {
+        void (err instanceof Error ? err.message : err)
       }
     },
     [deleteGoal]
@@ -106,7 +99,7 @@ const Goals: React.FC = () => {
   const getCurrentCarbon = (category: GoalCategory): number => {
     if (!summary) return 0
     if (category === 'total') return summary.totalCarbonKg
-    return summary.byCategory[category as ActivityCategory] ?? 0
+    return summary.byCategory[category] ?? 0
   }
 
   if (loading) {
@@ -191,9 +184,7 @@ const Goals: React.FC = () => {
               >
                 {GOAL_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat === 'total'
-                      ? 'Overall'
-                      : CATEGORY_CONFIG[cat as ActivityCategory]?.label || cat}
+                    {cat === 'total' ? 'Overall' : CATEGORY_CONFIG[cat]?.label || cat}
                   </option>
                 ))}
               </select>

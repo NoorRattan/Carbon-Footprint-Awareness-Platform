@@ -3,14 +3,21 @@ import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts'
 import { formatCarbon } from '../../utils/carbonFormatter'
 import type { ActivityCategory } from '../../types'
 
-interface CategoryDataPoint {
+/** Chart-ready category data point for the Recharts pie series. */
+export interface CategoryDataPoint {
+  /** Human-readable category label. */
   readonly name: string
+  /** Carbon total in kg CO2e. */
   readonly value: number
+  /** Category identifier for color lookup. */
   readonly category: ActivityCategory
+  /** Percentage of total emissions. */
   readonly percent: number
 }
 
-interface CategoryBreakdownProps {
+/** Props for the CategoryBreakdown component. */
+export interface CategoryBreakdownProps {
+  /** Carbon totals keyed by activity category. */
   readonly data: Record<ActivityCategory, number>
 }
 

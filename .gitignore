@@ -22,6 +22,9 @@ backend/serviceAccountKey.json
 backend/*serviceAccountKey*.json
 serviceAccountKey.json
 *serviceAccountKey*.json
+gcp-sa-key.json
+*-sa-key.json
+*.service-account.json
 
 # Coverage and test artifacts
 .coverage
@@ -37,6 +40,8 @@ backend/.pytest_cache/
 .idea/
 *.swp
 *.swo
+.firebase/
+.playwright-mcp/
 
 # OS
 .DS_Store

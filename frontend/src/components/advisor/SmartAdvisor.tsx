@@ -4,7 +4,7 @@ import { formatCarbon } from '../../utils/carbonFormatter'
 import { CATEGORY_CONFIG } from '../../utils/categoryConfig'
 import { insightsApi } from '../../services/api'
 import RecommendationCard from './RecommendationCard'
-import type { ActivityCategory, Recommendation } from '../../types'
+import type { Recommendation } from '../../types'
 
 /**
  * The hero personalised carbon advisor component. Fetches and displays user insights,
@@ -22,7 +22,9 @@ const SmartAdvisor: React.FC = () => {
 
   useEffect(() => {
     if (insight?.recommendations) {
-      setLocalRecommendations(insight.recommendations)
+      setLocalRecommendations(
+        [...insight.recommendations].sort((a, b) => b.estimatedSavingKg - a.estimatedSavingKg)
+      )
     }
   }, [insight])
 
@@ -30,7 +32,7 @@ const SmartAdvisor: React.FC = () => {
    * Acknowledges a recommendation with a fade-out animation before removing it.
    * @param id - The recommendation ID to acknowledge.
    */
-  const handleAcknowledge = useCallback(async (id: string) => {
+  const handleAcknowledge = useCallback(async (id: string): Promise<void> => {
     setFadingId(id)
     try {
       await insightsApi.acknowledge(id)
@@ -38,7 +40,8 @@ const SmartAdvisor: React.FC = () => {
         setLocalRecommendations((prev) => prev.filter((r) => r.id !== id))
         setFadingId(null)
       }, 300)
-    } catch {
+    } catch (err: unknown) {
+      void (err instanceof Error ? err.message : err)
       setFadingId(null)
     }
   }, [])
@@ -86,12 +89,7 @@ const SmartAdvisor: React.FC = () => {
 
   const topCategory = insight.topCategory
   const topCategoryLabel = CATEGORY_CONFIG[topCategory]?.label || topCategory
-  const total = insight.footprintKg
   const region = 'your region'
-
-  /** Calculate top category percentage. */
-  const topCategoryPercent =
-    total > 0 ? Math.round(((insight.recommendations.length > 0 ? total : total) / total) * 100) : 0
 
   return (
     <div className="space-y-6">
@@ -136,10 +134,8 @@ const SmartAdvisor: React.FC = () => {
 
       {/* Top category callout */}
       <p className="text-slate-700 font-medium">
-        <span aria-hidden="true">
-          {CATEGORY_CONFIG[topCategory as ActivityCategory]?.icon || '📊'}
-        </span>{' '}
-        {topCategoryLabel} is your biggest impact area ({topCategoryPercent}%)
+        <span aria-hidden="true">{CATEGORY_CONFIG[topCategory]?.icon || '📊'}</span>{' '}
+        {topCategoryLabel} is your biggest impact area.
       </p>
 
       {/* Recommendations */}

@@ -1,10 +1,15 @@
 import React from 'react'
 
-type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral'
+/** Visual variants supported by the Badge component. */
+export type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral'
 
-interface BadgeProps {
+/** Props for the Badge component. */
+export interface BadgeProps {
+  /** Badge text or inline content. */
   readonly children: React.ReactNode
+  /** Visual badge variant. */
   readonly variant?: BadgeVariant
+  /** Optional additional class names. */
   readonly className?: string
 }
 

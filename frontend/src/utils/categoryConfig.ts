@@ -1,15 +1,24 @@
 import type { ActivityCategory } from '../types/activity'
 
+/** Display metadata for a top-level activity category. */
 export interface CategoryMeta {
+  /** Human-readable category label. */
   readonly label: string
+  /** Decorative category icon. */
   readonly icon: string
+  /** Tailwind background color class for the category. */
   readonly color: string
+  /** Short category description. */
   readonly description: string
 }
 
+/** Display metadata and input hints for a calculator subcategory. */
 export interface SubcategoryMeta {
+  /** Human-readable subcategory label. */
   readonly label: string
+  /** Unit label displayed next to numeric values. */
   readonly unit: string
+  /** Example placeholder shown in amount inputs. */
   readonly placeholder: string
 }
 

@@ -2,13 +2,21 @@ import { useState, useCallback } from 'react'
 import { goalsApi } from '../services/api'
 import type { Goal, GoalCreateRequest, GoalUpdateRequest, GoalStatus } from '../types'
 
-interface UseGoalsReturn {
+/** State and actions returned by the useGoals hook. */
+export interface UseGoalsReturn {
+  /** Loaded goal records. */
   readonly goals: Goal[]
+  /** True while goals are being fetched. */
   readonly loading: boolean
+  /** Last goals API error message, if present. */
   readonly error: string | null
+  /** Fetches goals with an optional status filter. */
   readonly fetchGoals: (status?: GoalStatus) => Promise<void>
+  /** Creates a goal and appends it to local state. */
   readonly createGoal: (data: GoalCreateRequest) => Promise<Goal>
+  /** Updates a goal and reconciles local state. */
   readonly updateGoal: (id: string, data: GoalUpdateRequest) => Promise<void>
+  /** Deletes a goal and removes it from local state. */
   readonly deleteGoal: (id: string) => Promise<void>
 }
 
@@ -32,7 +40,7 @@ export function useGoals(): UseGoalsReturn {
     try {
       const response = await goalsApi.getAll(status)
       setGoals(response.goals)
-    } catch (err) {
+    } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to fetch goals'
       setError(message)
     } finally {
@@ -47,9 +55,15 @@ export function useGoals(): UseGoalsReturn {
    */
   const createGoal = useCallback(async (data: GoalCreateRequest): Promise<Goal> => {
     setError(null)
-    const goal = await goalsApi.create(data)
-    setGoals((prev) => [...prev, goal])
-    return goal
+    try {
+      const goal = await goalsApi.create(data)
+      setGoals((prev) => [...prev, goal])
+      return goal
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to create goal'
+      setError(message)
+      throw err
+    }
   }, [])
 
   /**
@@ -60,8 +74,14 @@ export function useGoals(): UseGoalsReturn {
    */
   const updateGoal = useCallback(async (id: string, data: GoalUpdateRequest): Promise<void> => {
     setError(null)
-    await goalsApi.update(id, data)
-    setGoals((prev) => prev.map((g) => (g.id === id ? { ...g, ...data } : g)))
+    try {
+      await goalsApi.update(id, data)
+      setGoals((prev) => prev.map((g) => (g.id === id ? { ...g, ...data } : g)))
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update goal'
+      setError(message)
+      throw err
+    }
   }, [])
 
   /**
@@ -71,8 +91,14 @@ export function useGoals(): UseGoalsReturn {
    */
   const deleteGoal = useCallback(async (id: string): Promise<void> => {
     setError(null)
-    await goalsApi.delete(id)
-    setGoals((prev) => prev.filter((g) => g.id !== id))
+    try {
+      await goalsApi.delete(id)
+      setGoals((prev) => prev.filter((g) => g.id !== id))
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to delete goal'
+      setError(message)
+      throw err
+    }
   }, [])
 
   return {
