@@ -9,7 +9,7 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import firebase_admin
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from firebase_admin import credentials
@@ -161,6 +161,17 @@ def create_app() -> FastAPI:
             "version": "1.0.0",
             "environment": settings.environment,
         }
+
+    @app.api_route(
+        "/api/{path:path}",
+        methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        include_in_schema=False,
+    )
+    async def api_fallback(path: str) -> None:
+        """Return a client error for suspicious API paths after URL normalisation."""
+        if ".." in path or "etc/passwd" in path:
+            raise HTTPException(status_code=400, detail="Invalid API path.")
+        raise HTTPException(status_code=404, detail="Not found.")
 
     return app
 

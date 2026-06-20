@@ -17,8 +17,15 @@ const auth = getAuth(app)
 
 let analytics: Analytics | null = null
 
+const hasAnalyticsConsent = (): boolean => {
+  if (typeof window === 'undefined') {
+    return false
+  }
+  return localStorage.getItem('ecotrack_analytics_consent') === 'true'
+}
+
 isSupported().then((supported) => {
-  if (supported) {
+  if (supported && hasAnalyticsConsent()) {
     analytics = getAnalytics(app)
   }
 })

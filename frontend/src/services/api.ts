@@ -8,6 +8,7 @@ import {
   ActivitiesSummary,
   DateRangeParams,
   Insight,
+  Recommendation,
   Goal,
   GoalCreateRequest,
   GoalUpdateRequest,
@@ -20,6 +21,183 @@ import {
   CarbonCalculateRequest,
   CarbonCalculateResponse,
 } from '../types'
+
+type RawActivity = Omit<Activity, 'userId' | 'carbonKg' | 'createdAt'> & {
+  user_id?: string
+  userId?: string
+  carbon_kg?: number
+  carbonKg?: number
+  created_at?: string
+  createdAt?: string
+}
+
+type RawActivitiesSummary = {
+  total_carbon_kg?: number
+  totalCarbonKg?: number
+  by_category?: ActivitiesSummary['byCategory']
+  byCategory?: ActivitiesSummary['byCategory']
+  period: ActivitiesSummary['period']
+}
+
+type RawRecommendation = Omit<Recommendation, 'estimatedSavingKg'> & {
+  estimated_saving_kg?: number
+  estimatedSavingKg?: number
+}
+
+type RawInsight = Omit<
+  Insight,
+  'footprintKg' | 'vsAveragePercent' | 'topCategory' | 'monthlyChangePercent' | 'generatedAt'
+> & {
+  footprint_kg?: number
+  footprintKg?: number
+  vs_average_percent?: number
+  vsAveragePercent?: number
+  top_category?: Activity['category'] | null
+  topCategory?: Activity['category'] | null
+  monthly_change_percent?: number
+  monthlyChangePercent?: number
+  generated_at?: string
+  generatedAt?: string
+  recommendations: RawRecommendation[]
+}
+
+type RawGoal = Omit<
+  Goal,
+  'targetReductionPercent' | 'baselineCarbonKg' | 'targetCarbonKg' | 'startDate' | 'endDate' | 'createdAt'
+> & {
+  target_reduction_percent?: number
+  targetReductionPercent?: number
+  baseline_carbon_kg?: number
+  baselineCarbonKg?: number
+  target_carbon_kg?: number
+  targetCarbonKg?: number
+  start_date?: string
+  startDate?: string
+  end_date?: string
+  endDate?: string
+  created_at?: string
+  createdAt?: string
+}
+
+type RawUserProfile = Omit<
+  UserProfile,
+  'displayName' | 'dietType' | 'householdSize' | 'createdAt'
+> & {
+  display_name?: string
+  displayName?: string
+  diet_type?: UserProfile['dietType']
+  dietType?: UserProfile['dietType']
+  household_size?: number
+  householdSize?: number
+  created_at?: string
+  createdAt?: string
+}
+
+type RawEducationArticle = Omit<EducationArticle, 'content' | 'readTime' | 'updatedAt'> & {
+  content?: string
+  read_time?: number
+  readTime?: number
+  updated_at?: string
+  updatedAt?: string
+}
+
+const mapActivity = (activity: RawActivity): Activity => ({
+  id: activity.id,
+  userId: activity.userId ?? activity.user_id ?? '',
+  category: activity.category,
+  subcategory: activity.subcategory,
+  amount: activity.amount,
+  unit: activity.unit,
+  carbonKg: activity.carbonKg ?? activity.carbon_kg ?? 0,
+  date: activity.date,
+  notes: activity.notes,
+  createdAt: activity.createdAt ?? activity.created_at ?? '',
+})
+
+const mapActivitiesSummary = (summary: RawActivitiesSummary): ActivitiesSummary => ({
+  totalCarbonKg: summary.totalCarbonKg ?? summary.total_carbon_kg ?? 0,
+  byCategory: summary.byCategory ?? summary.by_category ?? {
+    transport: 0,
+    food: 0,
+    energy: 0,
+    shopping: 0,
+    waste: 0,
+  },
+  period: summary.period,
+})
+
+const mapRecommendation = (recommendation: RawRecommendation): Recommendation => ({
+  id: recommendation.id,
+  title: recommendation.title,
+  description: recommendation.description,
+  category: recommendation.category,
+  estimatedSavingKg: recommendation.estimatedSavingKg ?? recommendation.estimated_saving_kg ?? 0,
+  difficulty: recommendation.difficulty,
+})
+
+const mapInsight = (insight: RawInsight): Insight => ({
+  footprintKg: insight.footprintKg ?? insight.footprint_kg ?? 0,
+  vsAveragePercent: insight.vsAveragePercent ?? insight.vs_average_percent ?? 0,
+  topCategory: insight.topCategory ?? insight.top_category ?? 'transport',
+  monthlyChangePercent: insight.monthlyChangePercent ?? insight.monthly_change_percent ?? 0,
+  recommendations: (insight.recommendations ?? []).map(mapRecommendation),
+  achievements: insight.achievements ?? [],
+  generatedAt: insight.generatedAt ?? insight.generated_at ?? '',
+})
+
+const mapGoal = (goal: RawGoal): Goal => ({
+  id: goal.id,
+  title: goal.title,
+  category: goal.category,
+  targetReductionPercent: goal.targetReductionPercent ?? goal.target_reduction_percent ?? 0,
+  baselineCarbonKg: goal.baselineCarbonKg ?? goal.baseline_carbon_kg ?? 0,
+  targetCarbonKg: goal.targetCarbonKg ?? goal.target_carbon_kg ?? 0,
+  startDate: goal.startDate ?? goal.start_date ?? '',
+  endDate: goal.endDate ?? goal.end_date ?? '',
+  status: goal.status,
+  createdAt: goal.createdAt ?? goal.created_at ?? '',
+})
+
+const mapUserProfile = (profile: RawUserProfile): UserProfile => ({
+  uid: profile.uid,
+  email: profile.email,
+  displayName: profile.displayName ?? profile.display_name ?? '',
+  region: profile.region,
+  dietType: profile.dietType ?? profile.diet_type ?? 'average',
+  householdSize: profile.householdSize ?? profile.household_size ?? 1,
+  createdAt: profile.createdAt ?? profile.created_at ?? '',
+  streak: profile.streak,
+  badges: profile.badges,
+})
+
+const mapEducationArticle = (article: RawEducationArticle): EducationArticle => ({
+  slug: article.slug,
+  title: article.title,
+  content: article.content ?? '',
+  category: article.category,
+  readTime: article.readTime ?? article.read_time ?? 0,
+  updatedAt: article.updatedAt ?? article.updated_at ?? '',
+})
+
+const toGoalCreatePayload = (data: GoalCreateRequest) => ({
+  title: data.title,
+  category: data.category,
+  target_reduction_percent: data.targetReductionPercent,
+  end_date: data.endDate,
+})
+
+const toGoalUpdatePayload = (data: GoalUpdateRequest) => ({
+  ...(data.title !== undefined ? { title: data.title } : {}),
+  ...(data.endDate !== undefined ? { end_date: data.endDate } : {}),
+  ...(data.status !== undefined ? { status: data.status } : {}),
+})
+
+const toUserProfileUpdatePayload = (data: UserProfileUpdateRequest) => ({
+  ...(data.displayName !== undefined ? { display_name: data.displayName } : {}),
+  ...(data.region !== undefined ? { region: data.region } : {}),
+  ...(data.dietType !== undefined ? { diet_type: data.dietType } : {}),
+  ...(data.householdSize !== undefined ? { household_size: data.householdSize } : {}),
+})
 
 // Create axios instance
 const apiClient = axios.create({
@@ -85,7 +263,10 @@ export const activitiesApi = {
    * @returns A promise resolving to the list of activities and total count.
    */
   getAll: (params?: ActivityFilterParams): Promise<ActivitiesResponse> =>
-    apiClient.get<ActivitiesResponse>('/activities', { params }).then((r) => r.data),
+    apiClient.get<{ activities: RawActivity[]; total: number }>('/activities', { params }).then((r) => ({
+      activities: r.data.activities.map(mapActivity),
+      total: r.data.total,
+    })),
 
   /**
    * Logs a new carbon-emitting activity.
@@ -93,7 +274,7 @@ export const activitiesApi = {
    * @returns A promise resolving to the newly created activity.
    */
   log: (data: ActivityCreateRequest): Promise<Activity> =>
-    apiClient.post<Activity>('/activities', data).then((r) => r.data),
+    apiClient.post<RawActivity>('/activities', data).then((r) => mapActivity(r.data)),
 
   /**
    * Deletes a logged activity.
@@ -108,7 +289,9 @@ export const activitiesApi = {
    * @returns A promise resolving to the activities summary data.
    */
   getSummary: (params?: DateRangeParams): Promise<ActivitiesSummary> =>
-    apiClient.get<ActivitiesSummary>('/activities/summary', { params }).then((r) => r.data),
+    apiClient
+      .get<RawActivitiesSummary>('/activities/summary', { params })
+      .then((r) => mapActivitiesSummary(r.data)),
 }
 
 /**
@@ -119,7 +302,7 @@ export const insightsApi = {
    * Fetches or triggers regeneration of personalized insights.
    * @returns A promise resolving to the user's carbon footprint insights.
    */
-  get: (): Promise<Insight> => apiClient.get<Insight>('/insights').then((r) => r.data),
+  get: (): Promise<Insight> => apiClient.get<RawInsight>('/insights').then((r) => mapInsight(r.data)),
 
   /**
    * Acknowledges a specific recommendation to filter it from future lists.
@@ -140,7 +323,9 @@ export const goalsApi = {
    * @returns A promise resolving to the list of goals.
    */
   getAll: (status?: GoalStatus): Promise<GoalsResponse> =>
-    apiClient.get<GoalsResponse>('/goals', { params: { status } }).then((r) => r.data),
+    apiClient.get<{ goals: RawGoal[] }>('/goals', { params: { status } }).then((r) => ({
+      goals: r.data.goals.map(mapGoal),
+    })),
 
   /**
    * Creates a new carbon reduction goal.
@@ -148,7 +333,7 @@ export const goalsApi = {
    * @returns A promise resolving to the created goal.
    */
   create: (data: GoalCreateRequest): Promise<Goal> =>
-    apiClient.post<Goal>('/goals', data).then((r) => r.data),
+    apiClient.post<RawGoal>('/goals', toGoalCreatePayload(data)).then((r) => mapGoal(r.data)),
 
   /**
    * Updates an existing goal's title, end date, or status.
@@ -157,7 +342,7 @@ export const goalsApi = {
    * @returns A promise resolving when the update completes.
    */
   update: (id: string, data: GoalUpdateRequest): Promise<void> =>
-    apiClient.put(`/goals/${id}`, data).then((r) => r.data),
+    apiClient.put(`/goals/${id}`, toGoalUpdatePayload(data)).then((r) => r.data),
 
   /**
    * Deletes a goal.
@@ -176,7 +361,7 @@ export const userApi = {
    * @returns A promise resolving to the user profile document.
    */
   getProfile: (): Promise<UserProfile> =>
-    apiClient.get<UserProfile>('/user/profile').then((r) => r.data),
+    apiClient.get<RawUserProfile>('/user/profile').then((r) => mapUserProfile(r.data)),
 
   /**
    * Updates fields on the user's profile.
@@ -184,7 +369,7 @@ export const userApi = {
    * @returns A promise resolving when the update completes.
    */
   updateProfile: (data: UserProfileUpdateRequest): Promise<void> =>
-    apiClient.put('/user/profile', data).then((r) => r.data),
+    apiClient.put('/user/profile', toUserProfileUpdatePayload(data)).then((r) => r.data),
 
   /**
    * Wipes all user data (activities, goals, insights, profile) under GDPR compliance.
@@ -197,7 +382,7 @@ export const userApi = {
    * @returns A promise resolving to the synced user profile document.
    */
   syncProfile: (): Promise<UserProfile> =>
-    apiClient.get<UserProfile>('/user/profile').then((r) => r.data),
+    apiClient.get<RawUserProfile>('/user/profile').then((r) => mapUserProfile(r.data)),
 }
 
 /**
@@ -211,8 +396,8 @@ export const educationApi = {
    */
   getAll: (category?: string): Promise<EducationListResponse> =>
     apiClient
-      .get<EducationListResponse>('/education', { params: { category } })
-      .then((r) => r.data),
+      .get<{ articles: RawEducationArticle[] }>('/education', { params: { category } })
+      .then((r) => ({ articles: r.data.articles.map(mapEducationArticle) })),
 
   /**
    * Fetches a full educational article by its slug.
@@ -220,7 +405,9 @@ export const educationApi = {
    * @returns A promise resolving to the full article details.
    */
   getBySlug: (slug: string): Promise<EducationArticle> =>
-    apiClient.get<EducationArticle>(`/education/${slug}`).then((r) => r.data),
+    apiClient
+      .get<RawEducationArticle>(`/education/${slug}`)
+      .then((r) => mapEducationArticle(r.data)),
 }
 
 /**

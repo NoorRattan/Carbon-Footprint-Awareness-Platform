@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     )
 
     # Google Cloud / Firebase
-    google_cloud_project: str = "ecotrack-app-2026"
+    google_cloud_project: str = "ecotrack-app-2026-1"
     firebase_service_account_key: str = "serviceAccountKey.json"
 
     # Application

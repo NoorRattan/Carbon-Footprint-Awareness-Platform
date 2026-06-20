@@ -536,6 +536,7 @@ async def test_get_activities_summary(mock_db) -> None:
     """get_activities_summary aggregates carbon totals by category."""
     query_mock = MagicMock()
     query_mock.where.return_value = query_mock
+    query_mock.order_by.return_value = query_mock
 
     snap1 = MagicMock()
     snap1.to_dict.return_value = {"category": "transport", "carbonKg": 10.0}

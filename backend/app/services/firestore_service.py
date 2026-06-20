@@ -383,6 +383,16 @@ async def _update_monthly_totals(uid: str, year_month: str, delta_kg: float) -> 
     logger.debug("Monthly totals updated for uid=%s month=%s delta=%.4f", uid, year_month, delta_kg)
 
 
+async def _invalidate_insights(uid: str) -> None:
+    """Delete cached insights after activity changes so recommendations stay current."""
+    db = get_db()
+    try:
+        await db.collection("insights").document(uid).delete()
+        logger.debug("Insights cache invalidated for uid=%s", uid)
+    except Exception:
+        logger.warning("Failed to invalidate insights cache for uid=%s", uid, exc_info=True)
+
+
 # ---------------------------------------------------------------------------
 # User functions
 # ---------------------------------------------------------------------------
@@ -573,6 +583,7 @@ async def log_activity(
     year_month = date_str[:7]  # "YYYY-MM"
     await _update_monthly_totals(uid, year_month, carbon_kg)
     await _update_streak(uid, date_str)
+    await _invalidate_insights(uid)
 
     return _activity_from_firestore(doc_ref.id, fs_doc)
 
@@ -654,6 +665,7 @@ async def delete_activity(uid: str, activity_id: str) -> dict[str, Any] | None:
     if date_str and carbon_kg:
         year_month = date_str[:7]
         await _update_monthly_totals(uid, year_month, -carbon_kg)
+    await _invalidate_insights(uid)
 
     return activity
 
@@ -705,6 +717,7 @@ async def get_activities_summary(
         .where("userId", "==", uid)
         .where("date", ">=", start_date)
         .where("date", "<=", end_date)
+        .order_by("date", direction=google.cloud.firestore.Query.DESCENDING)
     )
     categories = ["transport", "food", "energy", "shopping", "waste"]
     by_category: dict[str, float] = {c: 0.0 for c in categories}

@@ -3,7 +3,7 @@
 
 Usage:
     cd backend
-    GOOGLE_CLOUD_PROJECT=ecotrack-app-2026 python seed_data.py
+    GOOGLE_CLOUD_PROJECT=ecotrack-app-2026-1 python seed_data.py
 
 Safe to re-run because documents are written with merge=True.
 Requires Application Default Credentials or GOOGLE_APPLICATION_CREDENTIALS.
@@ -302,7 +302,7 @@ def seed_articles(db: firestore.Client) -> None:
 
 def main() -> None:
     """Connect to Firestore and seed the article collection."""
-    project = os.environ.get("GOOGLE_CLOUD_PROJECT", "ecotrack-app-2026")
+    project = os.environ.get("GOOGLE_CLOUD_PROJECT", "ecotrack-app-2026-1")
     db = firestore.Client(project=project)
     seed_articles(db)
     logger.info("Seeding complete.")

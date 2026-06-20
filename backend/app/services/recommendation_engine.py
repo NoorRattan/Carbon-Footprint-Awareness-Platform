@@ -172,7 +172,7 @@ async def generate_insights(
             "condition": (
                 by_category.get("transport", 0) > 0
                 and by_subcategory.get("car_petrol", 0.0) + by_subcategory.get("car_diesel", 0.0)
-                > 40
+                > 0
             ),
             "title": "Switch to public transport for regular journeys",
             "description_template": (
@@ -226,7 +226,7 @@ async def generate_insights(
         # --- FOOD ---
         {
             "id": "reduce_beef_weekly",
-            "condition": by_subcategory.get("beef", 0.0) > 20,
+            "condition": by_subcategory.get("beef", 0.0) > 0,
             "title": "Reduce beef consumption by one meal per week",
             "description_template": (
                 "Beef is your highest-impact food at {beef_kg:.1f} kg CO₂e this period. "
