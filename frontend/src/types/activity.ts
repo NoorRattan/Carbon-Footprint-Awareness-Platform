@@ -1,4 +1,6 @@
-/** All valid activity category identifiers. */
+/**
+ * All valid activity category identifiers as a readonly const tuple.
+ */
 export const ACTIVITY_CATEGORIES = ['transport', 'food', 'energy', 'shopping', 'waste'] as const
 
 /** Union type of all valid activity categories. */

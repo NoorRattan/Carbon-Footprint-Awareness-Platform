@@ -40,14 +40,10 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/activities", tags=["activities"])
 
 
+# fmt: off
 @router.get("/summary", response_model=ActivitiesSummary)
 @limiter.limit("60/minute")
-async def get_summary(
-    request: Request,
-    auth_token: AuthToken,
-    start_date: str | None = None,
-    end_date: str | None = None,
-) -> ActivitiesSummary:
+async def get_summary(request: Request, auth_token: AuthToken, start_date: str | None = None, end_date: str | None = None) -> ActivitiesSummary:  # noqa: E501
     """Return carbon totals by category for the requested date range.
 
     Defaults to the last 30 days when no date parameters are supplied.
@@ -63,6 +59,7 @@ async def get_summary(
     Returns:
         ActivitiesSummary with total_carbon_kg, per-category breakdown, and period.
     """
+# fmt: on
     uid: str = auth_token["uid"]
     today = date.today()
 
@@ -92,16 +89,10 @@ async def get_summary(
     )
 
 
+# fmt: off
 @router.get("", response_model=ActivitiesListResponse)
 @limiter.limit("60/minute")
-async def list_activities(
-    request: Request,
-    auth_token: AuthToken,
-    start_date: str | None = None,
-    end_date: str | None = None,
-    category: str | None = None,
-    limit: int = 50,
-) -> ActivitiesListResponse:
+async def list_activities(request: Request, auth_token: AuthToken, start_date: str | None = None, end_date: str | None = None, category: str | None = None, limit: int = 50) -> ActivitiesListResponse:  # noqa: E501
     """Return activities for the authenticated user within a date range.
 
     Args:
@@ -115,6 +106,7 @@ async def list_activities(
     Returns:
         ActivitiesListResponse with the activity list and total count.
     """
+# fmt: on
     uid: str = auth_token["uid"]
     today = date.today()
 
@@ -142,13 +134,10 @@ async def list_activities(
     return ActivitiesListResponse(activities=response_items, total=len(response_items))
 
 
+# fmt: off
 @router.post("", status_code=201, response_model=ActivityResponse)
 @limiter.limit("60/minute")
-async def create_activity(
-    request: Request,
-    body: ActivityCreate,
-    auth_token: AuthToken,
-) -> ActivityResponse:
+async def create_activity(request: Request, body: ActivityCreate, auth_token: AuthToken) -> ActivityResponse:  # noqa: E501
     """Log a new activity for the authenticated user.
 
     Validates the subcategory, calculates carbon_kg server-side, writes the
@@ -162,6 +151,7 @@ async def create_activity(
     Returns:
         ActivityResponse for the newly created activity with status 201.
     """
+# fmt: on
     uid: str = auth_token["uid"]
 
     valid_subs = VALID_SUBCATEGORIES.get(body.category, frozenset())
@@ -198,11 +188,7 @@ async def create_activity(
 
 @router.delete("/{activity_id}", status_code=200)
 @limiter.limit("60/minute")
-async def delete_activity(
-    request: Request,
-    activity_id: str,
-    auth_token: AuthToken,
-) -> dict:
+async def delete_activity(request: Request, activity_id: str, auth_token: AuthToken) -> dict:
     """Delete an activity owned by the authenticated user.
 
     Returns 404 if the activity does not exist or belongs to a different user.

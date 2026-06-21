@@ -21,10 +21,7 @@ router = APIRouter(prefix="/user", tags=["user"])
 
 @router.get("/profile", response_model=UserProfile)
 @limiter.limit("60/minute")
-async def get_profile(
-    request: Request,
-    auth_token: AuthToken,
-) -> UserProfile:
+async def get_profile(request: Request, auth_token: AuthToken) -> UserProfile:
     """Return the authenticated user's profile document.
 
     If the user document does not exist in Firestore (first login), it is
@@ -54,11 +51,7 @@ async def get_profile(
 
 @router.put("/profile")
 @limiter.limit("60/minute")
-async def update_profile(
-    request: Request,
-    body: UserProfileUpdate,
-    auth_token: AuthToken,
-) -> dict:
+async def update_profile(request: Request, body: UserProfileUpdate, auth_token: AuthToken) -> dict:
     """Update mutable fields on the authenticated user's profile.
 
     At least one field must be provided in the request body. Immutable
@@ -87,10 +80,7 @@ async def update_profile(
 
 @router.delete("/account")
 @limiter.limit("60/minute")
-async def delete_account(
-    request: Request,
-    auth_token: AuthToken,
-) -> dict:
+async def delete_account(request: Request, auth_token: AuthToken) -> dict:
     """Permanently delete the authenticated user's account and all associated data.
 
     Wipes all activity, goal, insight, and user documents from Firestore in

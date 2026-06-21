@@ -33,11 +33,7 @@ router = APIRouter(prefix="/goals", tags=["goals"])
 
 @router.get("", response_model=dict)
 @limiter.limit("60/minute")
-async def list_goals(
-    request: Request,
-    auth_token: AuthToken,
-    status: str | None = None,
-) -> dict:
+async def list_goals(request: Request, auth_token: AuthToken, status: str | None = None) -> dict:
     """Return all goals for the authenticated user, optionally filtered by status.
 
     Args:
@@ -63,11 +59,7 @@ async def list_goals(
 
 @router.post("", status_code=201, response_model=GoalResponse)
 @limiter.limit("60/minute")
-async def create_goal(
-    request: Request,
-    body: GoalCreate,
-    auth_token: AuthToken,
-) -> GoalResponse:
+async def create_goal(request: Request, body: GoalCreate, auth_token: AuthToken) -> GoalResponse:
     """Create a new carbon reduction goal for the authenticated user.
 
     Calculates baseline_carbon_kg from the last 30 days of activity for the
@@ -112,14 +104,10 @@ async def create_goal(
     return GoalResponse(**saved)
 
 
+# fmt: off
 @router.put("/{goal_id}")
 @limiter.limit("60/minute")
-async def update_goal(
-    request: Request,
-    goal_id: str,
-    body: GoalUpdate,
-    auth_token: AuthToken,
-) -> dict:
+async def update_goal(request: Request, goal_id: str, body: GoalUpdate, auth_token: AuthToken) -> dict:  # noqa: E501
     """Update an existing goal owned by the authenticated user.
 
     Returns 404 if the goal does not exist or belongs to a different user.
@@ -134,6 +122,7 @@ async def update_goal(
     Returns:
         Dict with a confirmation message on success.
     """
+# fmt: on
     uid: str = auth_token["uid"]
 
     updates = body.model_dump(exclude_none=True)
@@ -154,11 +143,7 @@ async def update_goal(
 
 @router.delete("/{goal_id}")
 @limiter.limit("60/minute")
-async def delete_goal(
-    request: Request,
-    goal_id: str,
-    auth_token: AuthToken,
-) -> dict:
+async def delete_goal(request: Request, goal_id: str, auth_token: AuthToken) -> dict:
     """Delete a goal owned by the authenticated user.
 
     Returns 404 if the goal does not exist or belongs to a different user.

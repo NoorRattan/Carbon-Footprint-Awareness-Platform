@@ -27,7 +27,9 @@ export interface AuthContextType {
   readonly getIdToken: () => Promise<string | null>
 }
 
-/** React context containing authentication state and actions. */
+/**
+ * React context providing authentication state and Firebase Auth methods.
+ */
 export const AuthContext = createContext<AuthContextType | null>(null)
 
 /** Props for the AuthProvider component. */

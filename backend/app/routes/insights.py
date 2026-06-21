@@ -31,10 +31,7 @@ _SIX_HOURS_SECONDS = 21600
 
 @router.get("", response_model=InsightResponse)
 @limiter.limit("60/minute")
-async def get_user_insights(
-    request: Request,
-    auth_token: AuthToken,
-) -> InsightResponse:
+async def get_user_insights(request: Request, auth_token: AuthToken) -> InsightResponse:
     """Return personalised carbon insights for the authenticated user.
 
     Insights are cached in Firestore and refreshed when the cache is older
@@ -93,13 +90,10 @@ async def get_user_insights(
     return result
 
 
+# fmt: off
 @router.post("/acknowledge/{recommendation_id}")
 @limiter.limit("60/minute")
-async def acknowledge_user_recommendation(
-    request: Request,
-    recommendation_id: str,
-    auth_token: AuthToken,
-) -> dict:
+async def acknowledge_user_recommendation(request: Request, recommendation_id: str, auth_token: AuthToken) -> dict:  # noqa: E501
     """Mark a recommendation as acknowledged for the authenticated user.
 
     Appends recommendation_id to the acknowledgedIds array in the user's
@@ -114,6 +108,7 @@ async def acknowledge_user_recommendation(
     Returns:
         Dict with a confirmation message.
     """
+# fmt: on
     uid: str = auth_token["uid"]
     await acknowledge_recommendation(uid, recommendation_id)
     logger.info(

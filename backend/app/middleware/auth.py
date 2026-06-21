@@ -22,10 +22,10 @@ logger = logging.getLogger(__name__)
 # auto_error=False so we can return 401 with a custom message instead of 403
 _bearer_scheme = HTTPBearer(auto_error=False)
 
+AuthCredentials = Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer_scheme)]
 
-async def require_auth(
-    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer_scheme)] = None,
-) -> dict:
+
+async def require_auth(credentials: AuthCredentials = None) -> dict:
     """Verify a Firebase ID token and return the decoded token payload.
 
     Extracts the Bearer token from the Authorization header, verifies it

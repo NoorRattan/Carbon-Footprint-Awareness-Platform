@@ -50,10 +50,7 @@ class CalculateResponse(BaseModel):
 
 @router.get("/education", response_model=dict)
 @limiter.limit("60/minute")
-async def list_articles(
-    request: Request,
-    category: str | None = None,
-) -> dict:
+async def list_articles(request: Request, category: str | None = None) -> dict:
     """Return summary cards for all published education articles.
 
     This endpoint is public — no authentication required.
@@ -73,10 +70,7 @@ async def list_articles(
 
 @router.get("/education/{slug}", response_model=EducationDetail)
 @limiter.limit("60/minute")
-async def get_article(
-    request: Request,
-    slug: str,
-) -> EducationDetail:
+async def get_article(request: Request, slug: str) -> EducationDetail:
     """Return the full content for a single education article identified by slug.
 
     Slug is validated against a strict alphanumeric-and-hyphens pattern before
@@ -105,10 +99,7 @@ async def get_article(
 
 @router.post("/calculate", response_model=CalculateResponse)
 @limiter.limit("30/minute")
-async def calculate(
-    request: Request,
-    body: CalculateRequest,
-) -> CalculateResponse:
+async def calculate(request: Request, body: CalculateRequest) -> CalculateResponse:
     """Calculate the carbon footprint for a given activity without authentication.
 
     Validates category and subcategory against the emission factor table, then

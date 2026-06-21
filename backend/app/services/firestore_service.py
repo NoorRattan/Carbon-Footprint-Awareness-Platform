@@ -533,16 +533,8 @@ async def delete_user_data(uid: str) -> None:
 # ---------------------------------------------------------------------------
 
 
-async def log_activity(
-    uid: str,
-    category: str,
-    subcategory: str,
-    amount: float,
-    unit: str,
-    carbon_kg: float,
-    date_str: str,
-    notes: str | None,
-) -> dict[str, Any]:
+# fmt: off
+async def log_activity(uid: str, category: str, subcategory: str, amount: float, unit: str, carbon_kg: float, date_str: str, notes: str | None) -> dict[str, Any]:  # noqa: E501
     """Write a new activity document to Firestore.
 
     Stores all fields in camelCase. The document ID is auto-generated
@@ -562,6 +554,7 @@ async def log_activity(
     Returns:
         A snake_case dict of the written document including the generated id.
     """
+# fmt: on
     db = get_db()
     now = datetime.now(UTC).isoformat()
     doc_data: dict[str, Any] = {
@@ -588,13 +581,8 @@ async def log_activity(
     return _activity_from_firestore(doc_ref.id, fs_doc)
 
 
-async def get_activities(
-    uid: str,
-    start_date: str,
-    end_date: str,
-    category: str | None = None,
-    limit: int = 50,
-) -> list[dict[str, Any]]:
+# fmt: off
+async def get_activities(uid: str, start_date: str, end_date: str, category: str | None = None, limit: int = 50) -> list[dict[str, Any]]:  # noqa: E501
     """Retrieve activities for a user within a date range.
 
     Results are ordered by date DESC (newest first). All Firestore camelCase
@@ -611,6 +599,7 @@ async def get_activities(
         List of snake_case activity dicts, newest first. Each dict includes
         an 'id' field with the Firestore document ID.
     """
+# fmt: on
     db = get_db()
     query = (
         db.collection("activities")
@@ -691,11 +680,7 @@ async def get_activity_by_id(activity_id: str) -> dict[str, Any] | None:
     return _activity_from_firestore(snapshot.id, snapshot.to_dict() or {})
 
 
-async def get_activities_summary(
-    uid: str,
-    start_date: str,
-    end_date: str,
-) -> dict[str, Any]:
+async def get_activities_summary(uid: str, start_date: str, end_date: str) -> dict[str, Any]:
     """Calculate aggregated carbon totals by category for a date range.
 
     Retrieves all activities in the date range (no limit applied here —
@@ -743,16 +728,8 @@ async def get_activities_summary(
 # ---------------------------------------------------------------------------
 
 
-async def create_goal(
-    uid: str,
-    title: str,
-    category: str,
-    target_reduction_percent: float,
-    baseline_carbon_kg: float,
-    target_carbon_kg: float,
-    start_date: str,
-    end_date: str,
-) -> dict[str, Any]:
+# fmt: off
+async def create_goal(uid: str, title: str, category: str, target_reduction_percent: float, baseline_carbon_kg: float, target_carbon_kg: float, start_date: str, end_date: str) -> dict[str, Any]:  # noqa: E501
     """Write a new goal document to Firestore.
 
     Also adds the 'goal_setter' badge to the user's badges list if not
@@ -771,6 +748,7 @@ async def create_goal(
     Returns:
         A snake_case dict of the written document including the generated id.
     """
+# fmt: on
     db = get_db()
     now = datetime.now(UTC).isoformat()
     doc_data: dict[str, Any] = {

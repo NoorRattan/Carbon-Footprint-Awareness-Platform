@@ -16,7 +16,9 @@ export interface UserContextType {
   readonly updateProfile: (data: UserProfileUpdateRequest) => Promise<void>
 }
 
-/** React context containing backend user profile state and actions. */
+/**
+ * React context providing the current user's EcoTrack profile data.
+ */
 export const UserContext = createContext<UserContextType | null>(null)
 
 /** Props for the UserProvider component. */

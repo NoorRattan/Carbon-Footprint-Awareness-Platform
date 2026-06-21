@@ -40,12 +40,8 @@ BADGES: dict[str, str] = {
 }
 
 
-async def generate_insights(
-    uid: str,
-    activities_current: list[dict[str, Any]],
-    activities_previous: list[dict[str, Any]],
-    user_profile: UserProfile,
-) -> InsightResponse:
+# fmt: off
+async def generate_insights(uid: str, activities_current: list[dict[str, Any]], activities_previous: list[dict[str, Any]], user_profile: UserProfile) -> InsightResponse:  # noqa: E501
     """Generate personalised carbon insights and recommendations for a user.
 
     Analyses the last 30 days of activity data (activities_current) and the
@@ -66,6 +62,7 @@ async def generate_insights(
         by estimated_saving_kg descending, earned achievement badges, and
         a generated_at ISO timestamp.
     """
+# fmt: on
     # ------------------------------------------------------------------
     # Step 1: Calculate totals from current 30-day activities
     # ------------------------------------------------------------------
