@@ -90,6 +90,7 @@ Generated: 2026-06-20 19:01 IST
 | BUG-7 | LOW | Traversal-style education path returned 404 after URL normalization instead of the requested 400. | backend/main.py | Added API fallback that returns 400 for suspicious normalized API paths. |
 | BUG-8 | MEDIUM | Learn article cards linked to /learn/:slug routes that rendered the 404 page. | frontend/src/App.tsx, frontend/src/pages/ArticleDetail.tsx | Added a public article detail route that fetches and renders education content by slug. |
 | BUG-9 | LOW | Footer privacy link pointed to a missing /privacy page. | frontend/src/App.tsx, frontend/src/pages/Privacy.tsx, frontend/src/components/layout/Footer.tsx | Added a public privacy policy page and linked it from the footer. |
+| BUG-10 | HIGH | Live frontend showed network errors because Cloud Run did not allow the Firebase Hosting origin when ALLOWED_ORIGINS was absent from deployment env vars. | backend/main.py, backend/tests/test_main.py | Added production Firebase Hosting origins to the strict CORS allowlist and covered preflight behavior with tests. |
 
 ## Verification Evidence
 

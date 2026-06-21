@@ -4,7 +4,46 @@ import logging
 
 from httpx import AsyncClient
 
+from app.config import Settings
+from main import _build_allowed_origins
+
 logger = logging.getLogger(__name__)
+
+
+class TestCorsConfiguration:
+    """Tests for strict CORS allowlist construction and middleware behavior."""
+
+    def test_production_cors_includes_firebase_hosting_origins(self) -> None:
+        """Production CORS allowlist always includes both Firebase Hosting domains."""
+        settings = Settings(
+            environment="production",
+            allowed_origins="https://custom.example.com",
+        )
+
+        allowed_origins = _build_allowed_origins(settings)
+
+        assert "https://ecotrack-app-2026-1.web.app" in allowed_origins
+        assert "https://ecotrack-app-2026-1.firebaseapp.com" in allowed_origins
+        assert "https://custom.example.com" in allowed_origins
+
+    async def test_cors_preflight_allows_configured_origin(
+        self, async_client: AsyncClient
+    ) -> None:
+        """CORS middleware returns allow-origin for a configured browser origin.
+
+        Args:
+            async_client: Async HTTP test client fixture.
+        """
+        response = await async_client.options(
+            "/api/v1/education",
+            headers={
+                "Origin": "http://localhost:5173",
+                "Access-Control-Request-Method": "GET",
+            },
+        )
+
+        assert response.status_code == 200
+        assert response.headers["access-control-allow-origin"] == "http://localhost:5173"
 
 
 class TestHealthEndpoint:

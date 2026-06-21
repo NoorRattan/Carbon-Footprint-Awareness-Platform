@@ -16,7 +16,7 @@ from firebase_admin import credentials
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from app.config import get_settings
+from app.config import Settings, get_settings
 from app.limiter import limiter
 
 logging.basicConfig(
@@ -25,6 +25,32 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+PRODUCTION_ALLOWED_ORIGINS = (
+    "https://ecotrack-app-2026-1.web.app",
+    "https://ecotrack-app-2026-1.firebaseapp.com",
+)
+
+
+def _build_allowed_origins(settings: Settings) -> list[str]:
+    """Build the strict CORS allowlist for the current runtime.
+
+    Args:
+        settings: Application settings containing environment and configured origins.
+
+    Returns:
+        Sorted list of allowed origins with production Firebase Hosting origins included.
+    """
+    configured_origins = {
+        origin.strip().rstrip("/")
+        for origin in settings.allowed_origins.split(",")
+        if origin.strip()
+    }
+
+    if settings.environment == "production":
+        configured_origins.update(PRODUCTION_ALLOWED_ORIGINS)
+
+    return sorted(configured_origins)
 
 
 def _init_firebase() -> None:
@@ -87,7 +113,7 @@ def create_app() -> FastAPI:
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
     # CORS — strict allowlist, NEVER wildcard in production
-    allowed_origins = [o.strip() for o in settings.allowed_origins.split(",")]
+    allowed_origins = _build_allowed_origins(settings)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=allowed_origins,

@@ -209,9 +209,22 @@ const toUserProfileUpdatePayload = (data: UserProfileUpdateRequest) => ({
   ...(data.householdSize !== undefined ? { household_size: data.householdSize } : {}),
 })
 
+const getApiBaseUrl = (): string => {
+  if (
+    typeof window !== 'undefined' &&
+    ['ecotrack-app-2026-1.web.app', 'ecotrack-app-2026-1.firebaseapp.com'].includes(
+      window.location.hostname
+    )
+  ) {
+    return '/api/v1'
+  }
+
+  return import.meta.env.VITE_API_BASE_URL || '/api/v1'
+}
+
 // Create axios instance
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: getApiBaseUrl(),
   headers: { 'Content-Type': 'application/json' },
 })
 
