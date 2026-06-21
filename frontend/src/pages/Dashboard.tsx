@@ -9,6 +9,7 @@ import MonthlyTrend from '../components/dashboard/MonthlyTrend'
 import RecommendationCard from '../components/advisor/RecommendationCard'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
+import { Skeleton } from '../components/ui/Skeleton'
 import { insightsApi } from '../services/api'
 import type { Recommendation } from '../types'
 import type { MonthlyDataPoint } from '../components/dashboard/MonthlyTrend'
@@ -93,8 +94,25 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div role="status" aria-live="polite" className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" />
+      <div role="status" aria-live="polite" aria-label="Loading dashboard" className="space-y-6">
+        <Skeleton className="h-9 w-64" />
+        <Card>
+          <div className="space-y-4">
+            <Skeleton className="mx-auto h-12 w-48" />
+            <Skeleton className="mx-auto h-5 w-32" />
+            <Skeleton className="mx-auto h-6 w-72" />
+          </div>
+        </Card>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <Card>
+            <Skeleton className="mb-4 h-6 w-48" />
+            <Skeleton className="h-48 w-full" />
+          </Card>
+          <Card>
+            <Skeleton className="mb-4 h-6 w-36" />
+            <Skeleton className="h-48 w-full" />
+          </Card>
+        </div>
       </div>
     )
   }

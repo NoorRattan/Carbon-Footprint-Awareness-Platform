@@ -27,6 +27,8 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/insights", tags=["insights"])
 
 _SIX_HOURS_SECONDS = 21600
+Req = Request
+Token = AuthToken
 
 
 @router.get("", response_model=InsightResponse)
@@ -90,10 +92,9 @@ async def get_user_insights(request: Request, auth_token: AuthToken) -> InsightR
     return result
 
 
-# fmt: off
 @router.post("/acknowledge/{recommendation_id}")
 @limiter.limit("60/minute")
-async def acknowledge_user_recommendation(request: Request, recommendation_id: str, auth_token: AuthToken) -> dict:  # noqa: E501
+async def ack_recommendation(request: Req, recommendation_id: str, token: Token) -> dict:
     """Mark a recommendation as acknowledged for the authenticated user.
 
     Appends recommendation_id to the acknowledgedIds array in the user's
@@ -103,13 +104,12 @@ async def acknowledge_user_recommendation(request: Request, recommendation_id: s
     Args:
         request: Incoming HTTP request (required by slowapi rate limiter).
         recommendation_id: Stable snake_case recommendation identifier.
-        auth_token: Decoded Firebase ID token from the auth dependency.
+        token: Decoded Firebase ID token from the auth dependency.
 
     Returns:
         Dict with a confirmation message.
     """
-# fmt: on
-    uid: str = auth_token["uid"]
+    uid: str = token["uid"]
     await acknowledge_recommendation(uid, recommendation_id)
     logger.info(
         "Recommendation acknowledged uid=%s rec_id=%s",

@@ -4,6 +4,7 @@ import { getCategoryIcon, formatCarbon } from '../../utils/carbonFormatter'
 import { SUBCATEGORY_CONFIG } from '../../utils/categoryConfig'
 import { formatDate } from '../../utils/dateUtils'
 import Button from '../ui/Button'
+import { Skeleton } from '../ui/Skeleton'
 import type { Activity } from '../../types'
 
 /**
@@ -60,8 +61,20 @@ const ActivityList: React.FC = () => {
 
   if (loading) {
     return (
-      <div role="status" aria-live="polite" className="text-center py-8 text-slate-500">
-        Loading recent activities...
+      <div role="status" aria-live="polite" className="space-y-3" aria-label="Loading activities">
+        <span className="sr-only">Loading activities...</span>
+        {[1, 2, 3].map((item) => (
+          <div key={item} className="rounded-lg border border-slate-200 bg-white p-3">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-3 w-1/3" />
+              </div>
+              <Skeleton className="h-4 w-16" />
+            </div>
+          </div>
+        ))}
       </div>
     )
   }

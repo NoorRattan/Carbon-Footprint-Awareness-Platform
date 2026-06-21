@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 /** Props for the ProgressBar component. */
 export interface ProgressBarProps {
@@ -21,14 +21,14 @@ export interface ProgressBarProps {
  * @param props - Progress bar configuration props.
  * @returns A styled progress bar element with ARIA support.
  */
-const ProgressBar: React.FC<ProgressBarProps> = ({
+export const ProgressBar = memo(function ProgressBar({
   value,
   max,
   label,
   showPercentage = true,
   color = 'bg-primary',
   className = '',
-}) => {
+}: ProgressBarProps): React.ReactElement {
   const percentage = max > 0 ? Math.min(Math.round((value / max) * 100), 100) : 0
 
   return (
@@ -54,6 +54,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       </div>
     </div>
   )
-}
+})
+
+ProgressBar.displayName = 'ProgressBar'
 
 export default ProgressBar

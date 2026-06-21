@@ -4,6 +4,7 @@ import { formatCarbon } from '../../utils/carbonFormatter'
 import { CATEGORY_CONFIG } from '../../utils/categoryConfig'
 import { insightsApi } from '../../services/api'
 import RecommendationCard from './RecommendationCard'
+import { Skeleton } from '../ui/Skeleton'
 import type { Recommendation } from '../../types'
 
 /**
@@ -56,10 +57,10 @@ const SmartAdvisor: React.FC = () => {
         className="space-y-4"
       >
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white rounded-xl border border-slate-200 p-6 animate-pulse">
-            <div className="h-4 bg-slate-200 rounded w-3/4 mb-3" />
-            <div className="h-3 bg-slate-200 rounded w-full mb-2" />
-            <div className="h-3 bg-slate-200 rounded w-1/2" />
+          <div key={i} className="rounded-xl border border-slate-200 bg-white p-6">
+            <Skeleton className="mb-3 h-4 w-3/4" />
+            <Skeleton className="mb-2 h-3 w-full" />
+            <Skeleton className="h-3 w-1/2" />
           </div>
         ))}
       </div>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { formatCarbon } from '../../utils/carbonFormatter'
 import Badge from '../ui/Badge'
 
@@ -19,12 +19,12 @@ export interface FootprintSummaryProps {
  * @param props - Footprint summary data including total, comparison percentages, and region.
  * @returns A summary card showing the user's carbon footprint status.
  */
-const FootprintSummary: React.FC<FootprintSummaryProps> = ({
+export const FootprintSummary = memo(function FootprintSummary({
   totalCarbonKg,
   vsAveragePercent,
   monthlyChangePercent,
   region,
-}) => {
+}: FootprintSummaryProps): React.ReactElement {
   return (
     <div className="text-center space-y-3">
       <p className="text-5xl font-bold text-slate-900">{formatCarbon(totalCarbonKg)}</p>
@@ -50,6 +50,8 @@ const FootprintSummary: React.FC<FootprintSummaryProps> = ({
       </div>
     </div>
   )
-}
+})
+
+FootprintSummary.displayName = 'FootprintSummary'
 
 export default FootprintSummary

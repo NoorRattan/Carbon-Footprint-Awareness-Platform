@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { formatCarbon } from '../../utils/carbonFormatter'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
@@ -26,10 +26,10 @@ const DIFFICULTY_VARIANTS: Record<Difficulty, BadgeVariant> = {
  * @param props - The recommendation data and acknowledge callback.
  * @returns A styled recommendation card with fade-out transition support.
  */
-const RecommendationCard: React.FC<RecommendationCardProps> = ({
+export const RecommendationCard = memo(function RecommendationCard({
   recommendation,
   onAcknowledge,
-}) => {
+}: RecommendationCardProps): React.ReactElement {
   return (
     <Card hoverable className="transition-opacity duration-300">
       <div aria-label={`Recommendation: ${recommendation.title}`}>
@@ -55,6 +55,8 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
       </div>
     </Card>
   )
-}
+})
+
+RecommendationCard.displayName = 'RecommendationCard'
 
 export default RecommendationCard

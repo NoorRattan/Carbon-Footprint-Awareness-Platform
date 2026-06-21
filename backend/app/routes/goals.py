@@ -30,6 +30,9 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/goals", tags=["goals"])
 
+Req = Request
+Token = AuthToken
+
 
 @router.get("", response_model=dict)
 @limiter.limit("60/minute")
@@ -104,10 +107,9 @@ async def create_goal(request: Request, body: GoalCreate, auth_token: AuthToken)
     return GoalResponse(**saved)
 
 
-# fmt: off
 @router.put("/{goal_id}")
 @limiter.limit("60/minute")
-async def update_goal(request: Request, goal_id: str, body: GoalUpdate, auth_token: AuthToken) -> dict:  # noqa: E501
+async def update_goal(request: Req, goal_id: str, body: GoalUpdate, token: Token) -> dict:
     """Update an existing goal owned by the authenticated user.
 
     Returns 404 if the goal does not exist or belongs to a different user.
@@ -117,13 +119,12 @@ async def update_goal(request: Request, goal_id: str, body: GoalUpdate, auth_tok
         request: Incoming HTTP request (required by slowapi rate limiter).
         goal_id: Firestore document ID of the goal to update.
         body: GoalUpdate request body with optional title, end_date, status.
-        auth_token: Decoded Firebase ID token from the auth dependency.
+        token: Decoded Firebase ID token from the auth dependency.
 
     Returns:
         Dict with a confirmation message on success.
     """
-# fmt: on
-    uid: str = auth_token["uid"]
+    uid: str = token["uid"]
 
     updates = body.model_dump(exclude_none=True)
     if not updates:

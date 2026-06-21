@@ -39,11 +39,14 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/activities", tags=["activities"])
 
+Req = Request
+ActivityIn = ActivityCreate
+ActivityOut = ActivityResponse
 
-# fmt: off
+
 @router.get("/summary", response_model=ActivitiesSummary)
 @limiter.limit("60/minute")
-async def get_summary(request: Request, auth_token: AuthToken, start_date: str | None = None, end_date: str | None = None) -> ActivitiesSummary:  # noqa: E501
+async def get_summary(request: Request, auth_token: AuthToken) -> ActivitiesSummary:
     """Return carbon totals by category for the requested date range.
 
     Defaults to the last 30 days when no date parameters are supplied.
@@ -53,14 +56,15 @@ async def get_summary(request: Request, auth_token: AuthToken, start_date: str |
     Args:
         request: Incoming HTTP request (required by slowapi rate limiter).
         auth_token: Decoded Firebase ID token from the auth dependency.
-        start_date: Optional ISO date string 'YYYY-MM-DD'. Defaults to 30 days ago.
-        end_date: Optional ISO date string 'YYYY-MM-DD'. Defaults to today.
+        start_date: Optional 'YYYY-MM-DD' query value. Defaults to 30 days ago.
+        end_date: Optional 'YYYY-MM-DD' query value. Defaults to today.
 
     Returns:
         ActivitiesSummary with total_carbon_kg, per-category breakdown, and period.
     """
-# fmt: on
     uid: str = auth_token["uid"]
+    start_date = request.query_params.get("start_date")
+    end_date = request.query_params.get("end_date")
     today = date.today()
 
     parsed_start = _parse_date_param(start_date, today - timedelta(days=30))
@@ -89,10 +93,9 @@ async def get_summary(request: Request, auth_token: AuthToken, start_date: str |
     )
 
 
-# fmt: off
 @router.get("", response_model=ActivitiesListResponse)
 @limiter.limit("60/minute")
-async def list_activities(request: Request, auth_token: AuthToken, start_date: str | None = None, end_date: str | None = None, category: str | None = None, limit: int = 50) -> ActivitiesListResponse:  # noqa: E501
+async def list_activities(request: Request, auth_token: AuthToken) -> ActivitiesListResponse:
     """Return activities for the authenticated user within a date range.
 
     Args:
@@ -106,8 +109,11 @@ async def list_activities(request: Request, auth_token: AuthToken, start_date: s
     Returns:
         ActivitiesListResponse with the activity list and total count.
     """
-# fmt: on
     uid: str = auth_token["uid"]
+    start_date = request.query_params.get("start_date")
+    end_date = request.query_params.get("end_date")
+    category = request.query_params.get("category")
+    limit = _parse_limit_param(request.query_params.get("limit"), 50)
     today = date.today()
 
     parsed_start = _parse_date_param(start_date, today - timedelta(days=30))
@@ -134,10 +140,9 @@ async def list_activities(request: Request, auth_token: AuthToken, start_date: s
     return ActivitiesListResponse(activities=response_items, total=len(response_items))
 
 
-# fmt: off
 @router.post("", status_code=201, response_model=ActivityResponse)
 @limiter.limit("60/minute")
-async def create_activity(request: Request, body: ActivityCreate, auth_token: AuthToken) -> ActivityResponse:  # noqa: E501
+async def create_activity(request: Req, body: ActivityIn, auth_token: AuthToken) -> ActivityOut:
     """Log a new activity for the authenticated user.
 
     Validates the subcategory, calculates carbon_kg server-side, writes the
@@ -151,7 +156,6 @@ async def create_activity(request: Request, body: ActivityCreate, auth_token: Au
     Returns:
         ActivityResponse for the newly created activity with status 201.
     """
-# fmt: on
     uid: str = auth_token["uid"]
 
     valid_subs = VALID_SUBCATEGORIES.get(body.category, frozenset())
@@ -167,14 +171,14 @@ async def create_activity(request: Request, body: ActivityCreate, auth_token: Au
     unit = get_unit_label(body.category, body.subcategory)
 
     saved = await log_activity(
-        uid,
-        body.category,
-        body.subcategory,
-        body.amount,
-        unit,
-        carbon_kg,
-        body.date.isoformat(),
-        body.notes,
+        uid=uid,
+        category=body.category,
+        subcategory=body.subcategory,
+        amount=body.amount,
+        unit=unit,
+        carbon_kg=carbon_kg,
+        date_str=body.date.isoformat(),
+        notes=body.notes,
     )
 
     logger.info(
@@ -240,3 +244,24 @@ def _parse_date_param(value: str | None, default: date) -> date:
             status_code=400,
             detail=f"Invalid date format '{value}'. Expected YYYY-MM-DD.",
         ) from exc
+
+
+def _parse_limit_param(value: str | None, default: int) -> int:
+    """Parse an optional positive integer limit query parameter.
+
+    Args:
+        value: Optional query string value for the limit parameter.
+        default: Limit to use when value is None.
+
+    Returns:
+        Parsed integer limit.
+
+    Raises:
+        HTTPException: 400 if value is present but is not an integer.
+    """
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="Invalid limit. Expected an integer.") from exc

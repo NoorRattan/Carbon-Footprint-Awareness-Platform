@@ -13,7 +13,7 @@ client per request would exhaust connections.
 
 import logging
 from datetime import UTC, date, datetime, timedelta
-from typing import Any
+from typing import Any, NotRequired, TypedDict, Unpack, cast
 
 import google.cloud.firestore
 from google.cloud.firestore_v1 import AsyncDocumentReference
@@ -22,6 +22,49 @@ logger = logging.getLogger(__name__)
 
 # Singleton Firestore client — created once on first call to get_db()
 _db: google.cloud.firestore.AsyncClient | None = None
+
+Json = dict[str, Any]
+Rows = list[Json]
+Fields = tuple[str, ...]
+Args = tuple[Any, ...]
+Kwargs = dict[str, Any]
+OptKwargs = Kwargs | None
+
+
+class LogActivityData(TypedDict):
+    """Keyword arguments accepted by log_activity."""
+
+    uid: str
+    category: str
+    subcategory: str
+    amount: float
+    unit: str
+    carbon_kg: float
+    date_str: str
+    notes: str | None
+
+
+class GetActivitiesData(TypedDict):
+    """Keyword arguments accepted by get_activities."""
+
+    uid: str
+    start_date: str
+    end_date: str
+    category: NotRequired[str | None]
+    limit: NotRequired[int]
+
+
+class CreateGoalData(TypedDict):
+    """Keyword arguments accepted by create_goal."""
+
+    uid: str
+    title: str
+    category: str
+    target_reduction_percent: float
+    baseline_carbon_kg: float
+    target_carbon_kg: float
+    start_date: str
+    end_date: str
 
 
 def get_db() -> google.cloud.firestore.AsyncClient:
@@ -35,6 +78,41 @@ def get_db() -> google.cloud.firestore.AsyncClient:
     if _db is None:
         _db = google.cloud.firestore.AsyncClient()
     return _db
+
+
+def _bind_args(fields: Fields, args: Args, kwargs: Kwargs, defaults: OptKwargs = None) -> Kwargs:
+    """Bind positional and keyword arguments for compatibility wrappers.
+
+    Args:
+        fields: Ordered public argument names accepted by the wrapped function.
+        args: Positional values supplied by the caller.
+        kwargs: Keyword values supplied by the caller.
+        defaults: Optional default values to seed before binding caller values.
+
+    Returns:
+        Dictionary containing the bound argument values.
+
+    Raises:
+        TypeError: If too many positional values, duplicate values, or missing
+            required values are supplied.
+    """
+    if len(args) > len(fields):
+        raise TypeError(f"Expected at most {len(fields)} positional arguments, got {len(args)}.")
+
+    bound = dict(defaults or {})
+    positional = dict(zip(fields, args, strict=False))
+    duplicates = sorted(set(positional).intersection(kwargs))
+    if duplicates:
+        raise TypeError(f"Multiple values for argument(s): {', '.join(duplicates)}")
+
+    bound.update(positional)
+    bound.update(kwargs)
+
+    missing = [field for field in fields if field not in bound]
+    if missing:
+        raise TypeError(f"Missing required argument(s): {', '.join(missing)}")
+
+    return bound
 
 
 # ---------------------------------------------------------------------------
@@ -533,8 +611,7 @@ async def delete_user_data(uid: str) -> None:
 # ---------------------------------------------------------------------------
 
 
-# fmt: off
-async def log_activity(uid: str, category: str, subcategory: str, amount: float, unit: str, carbon_kg: float, date_str: str, notes: str | None) -> dict[str, Any]:  # noqa: E501
+async def log_activity(*args: Any, **kwargs: Unpack[LogActivityData]) -> Json:
     """Write a new activity document to Firestore.
 
     Stores all fields in camelCase. The document ID is auto-generated
@@ -554,10 +631,23 @@ async def log_activity(uid: str, category: str, subcategory: str, amount: float,
     Returns:
         A snake_case dict of the written document including the generated id.
     """
-# fmt: on
+    values = _bind_args(
+        ("uid", "category", "subcategory", "amount", "unit", "carbon_kg", "date_str", "notes"),
+        args,
+        kwargs,
+    )
+    uid = cast(str, values["uid"])
+    category = cast(str, values["category"])
+    subcategory = cast(str, values["subcategory"])
+    amount = cast(float, values["amount"])
+    unit = cast(str, values["unit"])
+    carbon_kg = cast(float, values["carbon_kg"])
+    date_str = cast(str, values["date_str"])
+    notes = cast(str | None, values["notes"])
+
     db = get_db()
     now = datetime.now(UTC).isoformat()
-    doc_data: dict[str, Any] = {
+    doc_data: Json = {
         "category": category,
         "subcategory": subcategory,
         "amount": amount,
@@ -581,8 +671,7 @@ async def log_activity(uid: str, category: str, subcategory: str, amount: float,
     return _activity_from_firestore(doc_ref.id, fs_doc)
 
 
-# fmt: off
-async def get_activities(uid: str, start_date: str, end_date: str, category: str | None = None, limit: int = 50) -> list[dict[str, Any]]:  # noqa: E501
+async def get_activities(*args: Any, **kwargs: Unpack[GetActivitiesData]) -> Rows:
     """Retrieve activities for a user within a date range.
 
     Results are ordered by date DESC (newest first). All Firestore camelCase
@@ -599,7 +688,18 @@ async def get_activities(uid: str, start_date: str, end_date: str, category: str
         List of snake_case activity dicts, newest first. Each dict includes
         an 'id' field with the Firestore document ID.
     """
-# fmt: on
+    values = _bind_args(
+        ("uid", "start_date", "end_date", "category", "limit"),
+        args,
+        kwargs,
+        {"category": None, "limit": 50},
+    )
+    uid = cast(str, values["uid"])
+    start_date = cast(str, values["start_date"])
+    end_date = cast(str, values["end_date"])
+    category = cast(str | None, values["category"])
+    limit = cast(int, values["limit"])
+
     db = get_db()
     query = (
         db.collection("activities")
@@ -612,7 +712,7 @@ async def get_activities(uid: str, start_date: str, end_date: str, category: str
     if category:
         query = query.where("category", "==", category)
 
-    results: list[dict[str, Any]] = []
+    results: Rows = []
     async for snap in query.stream():
         results.append(_activity_from_firestore(snap.id, snap.to_dict() or {}))
     return results
@@ -728,8 +828,7 @@ async def get_activities_summary(uid: str, start_date: str, end_date: str) -> di
 # ---------------------------------------------------------------------------
 
 
-# fmt: off
-async def create_goal(uid: str, title: str, category: str, target_reduction_percent: float, baseline_carbon_kg: float, target_carbon_kg: float, start_date: str, end_date: str) -> dict[str, Any]:  # noqa: E501
+async def create_goal(*args: Any, **kwargs: Unpack[CreateGoalData]) -> Json:
     """Write a new goal document to Firestore.
 
     Also adds the 'goal_setter' badge to the user's badges list if not
@@ -748,10 +847,32 @@ async def create_goal(uid: str, title: str, category: str, target_reduction_perc
     Returns:
         A snake_case dict of the written document including the generated id.
     """
-# fmt: on
+    values = _bind_args(
+        (
+            "uid",
+            "title",
+            "category",
+            "target_reduction_percent",
+            "baseline_carbon_kg",
+            "target_carbon_kg",
+            "start_date",
+            "end_date",
+        ),
+        args,
+        kwargs,
+    )
+    uid = cast(str, values["uid"])
+    title = cast(str, values["title"])
+    category = cast(str, values["category"])
+    target_reduction_percent = cast(float, values["target_reduction_percent"])
+    baseline_carbon_kg = cast(float, values["baseline_carbon_kg"])
+    target_carbon_kg = cast(float, values["target_carbon_kg"])
+    start_date = cast(str, values["start_date"])
+    end_date = cast(str, values["end_date"])
+
     db = get_db()
     now = datetime.now(UTC).isoformat()
-    doc_data: dict[str, Any] = {
+    doc_data: Json = {
         "title": title,
         "category": category,
         "target_reduction_percent": target_reduction_percent,

@@ -25,6 +25,10 @@ from app.services.carbon_calculator import NATIONAL_AVERAGES
 logger = logging.getLogger(__name__)
 
 CATEGORIES: list[str] = ["transport", "food", "energy", "shopping", "waste"]
+Json = dict[str, Any]
+Rows = list[Json]
+Profile = UserProfile
+Insights = InsightResponse
 
 BADGES: dict[str, str] = {
     "first_log": "Logged your first activity",
@@ -40,8 +44,7 @@ BADGES: dict[str, str] = {
 }
 
 
-# fmt: off
-async def generate_insights(uid: str, activities_current: list[dict[str, Any]], activities_previous: list[dict[str, Any]], user_profile: UserProfile) -> InsightResponse:  # noqa: E501
+async def generate_insights(uid: str, current: Rows, previous: Rows, profile: Profile) -> Insights:
     """Generate personalised carbon insights and recommendations for a user.
 
     Analyses the last 30 days of activity data (activities_current) and the
@@ -62,7 +65,10 @@ async def generate_insights(uid: str, activities_current: list[dict[str, Any]], 
         by estimated_saving_kg descending, earned achievement badges, and
         a generated_at ISO timestamp.
     """
-# fmt: on
+    activities_current = current
+    activities_previous = previous
+    user_profile = profile
+
     # ------------------------------------------------------------------
     # Step 1: Calculate totals from current 30-day activities
     # ------------------------------------------------------------------

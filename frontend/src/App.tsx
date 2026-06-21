@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { useContext } from 'react'
 import { AuthContext } from './contexts/AuthContext'
 import Layout from './components/layout/Layout'
+import { ErrorBoundary } from './components/ui/ErrorBoundary'
 
 const Home = lazy(() => import('./pages/Home'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
@@ -54,37 +55,39 @@ const ProtectedRoute: React.FC = () => {
  */
 const App: React.FC = () => {
   return (
-    <Suspense
-      fallback={
-        <div
-          className="min-h-screen flex items-center justify-center bg-slate-50"
-          role="status"
-          aria-label="Loading page"
-        >
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      }
-    >
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/learn" element={<Learn />} />
-          <Route path="/learn/:slug" element={<ArticleDetail />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/privacy" element={<Privacy />} />
+    <ErrorBoundary>
+      <Suspense
+        fallback={
+          <div
+            className="min-h-screen flex items-center justify-center bg-slate-50"
+            role="status"
+            aria-label="Loading page"
+          >
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        }
+      >
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/learn" element={<Learn />} />
+            <Route path="/learn/:slug" element={<ArticleDetail />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/privacy" element={<Privacy />} />
 
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/log" element={<LogActivity />} />
-            <Route path="/insights" element={<Insights />} />
-            <Route path="/goals" element={<Goals />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/log" element={<LogActivity />} />
+              <Route path="/insights" element={<Insights />} />
+              <Route path="/goals" element={<Goals />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
+
+            <Route path="*" element={<NotFound />} />
           </Route>
-
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
-    </Suspense>
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
   )
 }
 

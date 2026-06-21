@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { formatCarbon } from '../../utils/carbonFormatter'
 import { CATEGORY_CONFIG } from '../../utils/categoryConfig'
 import Card from '../ui/Card'
@@ -36,7 +36,11 @@ function getCategoryLabel(category: GoalCategory): string {
  * @param props - The goal data, current carbon emissions, and delete callback.
  * @returns A styled goal card with progress tracking.
  */
-const GoalCard: React.FC<GoalCardProps> = ({ goal, currentCarbonKg, onDelete }) => {
+export const GoalCard = memo(function GoalCard({
+  goal,
+  currentCarbonKg,
+  onDelete,
+}: GoalCardProps): React.ReactElement {
   const progressRange = goal.baselineCarbonKg - goal.targetCarbonKg
   const progressValue = goal.baselineCarbonKg - currentCarbonKg
   const progressPercent =
@@ -99,6 +103,8 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, currentCarbonKg, onDelete }) 
       </div>
     </Card>
   )
-}
+})
+
+GoalCard.displayName = 'GoalCard'
 
 export default GoalCard

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 /** Props for the Card component. */
 export interface CardProps {
@@ -24,12 +24,12 @@ const paddingClasses = {
  * @param props - Card configuration props.
  * @returns A styled card container element.
  */
-const Card: React.FC<CardProps> = ({
+export const Card = memo(function Card({
   children,
   className = '',
   padding = 'md',
   hoverable = false,
-}) => {
+}: CardProps): React.ReactElement {
   return (
     <div
       className={`
@@ -42,6 +42,8 @@ const Card: React.FC<CardProps> = ({
       {children}
     </div>
   )
-}
+})
+
+Card.displayName = 'Card'
 
 export default Card

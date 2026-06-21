@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 /** Visual variants supported by the Badge component. */
 export type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral'
@@ -26,7 +26,11 @@ const variantClasses: Record<BadgeVariant, string> = {
  * @param props - Badge configuration props.
  * @returns A styled inline badge element.
  */
-const Badge: React.FC<BadgeProps> = ({ children, variant = 'neutral', className = '' }) => {
+export const Badge = memo(function Badge({
+  children,
+  variant = 'neutral',
+  className = '',
+}: BadgeProps): React.ReactElement {
   return (
     <span
       className={`
@@ -39,6 +43,8 @@ const Badge: React.FC<BadgeProps> = ({ children, variant = 'neutral', className 
       {children}
     </span>
   )
-}
+})
+
+Badge.displayName = 'Badge'
 
 export default Badge
