@@ -34,7 +34,7 @@ describe('Input', () => {
     expect(alert).toHaveTextContent('Name is required')
   })
 
-  it('onChange fires correctly', async () => {
+  it('onChange fires correctly', async (): Promise<void> => {
     const user = userEvent.setup()
     const handleChange = vi.fn()
     render(<Input id="city" label="City" value="" onChange={handleChange} />)

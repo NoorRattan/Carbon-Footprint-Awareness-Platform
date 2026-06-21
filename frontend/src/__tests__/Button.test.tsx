@@ -37,7 +37,7 @@ describe('Button', () => {
     expect(svg).toHaveClass('animate-spin')
   })
 
-  it('disabled=true prevents onClick from firing', async () => {
+  it('disabled=true prevents onClick from firing', async (): Promise<void> => {
     const user = userEvent.setup()
     const handleClick = vi.fn()
     render(

@@ -66,14 +66,14 @@ describe('Goals Page', () => {
     expect(screen.getByRole('status')).toBeInTheDocument()
   })
 
-  it('renders the goals heading after loading', async () => {
+  it('renders the goals heading after loading', async (): Promise<void> => {
     renderWithProviders(<Goals />)
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /My Reduction Goals/i })).toBeInTheDocument()
     })
   })
 
-  it('creates a new goal from the form', async () => {
+  it('creates a new goal from the form', async (): Promise<void> => {
     const user = userEvent.setup()
     const createdGoal: Goal = {
       id: 'goal-1',
@@ -111,7 +111,7 @@ describe('Goals Page', () => {
     })
   })
 
-  it('deletes an active goal card', async () => {
+  it('deletes an active goal card', async (): Promise<void> => {
     const user = userEvent.setup()
     const activeGoal: Goal = {
       id: 'goal-delete',

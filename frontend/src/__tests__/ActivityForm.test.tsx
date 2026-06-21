@@ -61,7 +61,7 @@ describe('ActivityForm', () => {
     expect(screen.getByRole('button', { name: /transport/i })).toBeInTheDocument()
   })
 
-  it('selecting a category shows subcategory dropdown', async () => {
+  it('selecting a category shows subcategory dropdown', async (): Promise<void> => {
     const user = userEvent.setup()
     renderWithProviders(<ActivityForm onSuccess={vi.fn()} />)
 
@@ -70,7 +70,7 @@ describe('ActivityForm', () => {
     expect(screen.getByRole('combobox', { name: /subcategory/i })).toBeInTheDocument()
   })
 
-  it('all visible inputs on step 3 have accessible names', async () => {
+  it('all visible inputs on step 3 have accessible names', async (): Promise<void> => {
     const user = userEvent.setup()
     renderWithProviders(<ActivityForm onSuccess={vi.fn()} />)
 
@@ -81,7 +81,7 @@ describe('ActivityForm', () => {
     expect(screen.getByLabelText(/amount/i)).toBeInTheDocument()
   })
 
-  it('live estimate appears when amount is entered (carbonApi.calculate is called)', async () => {
+  it('live estimate appears when amount is entered (carbonApi.calculate is called)', async (): Promise<void> => {
     const user = userEvent.setup()
     ;(carbonApi.calculate as Mock).mockResolvedValue({ carbon_kg: 5.2 })
 
@@ -100,7 +100,7 @@ describe('ActivityForm', () => {
     )
   })
 
-  it('submit calls activitiesApi.log with correct payload', async () => {
+  it('submit calls activitiesApi.log with correct payload', async (): Promise<void> => {
     const user = userEvent.setup()
     const onSuccess = vi.fn()
     ;(carbonApi.calculate as Mock).mockResolvedValue({ carbon_kg: 3.8 })
@@ -158,7 +158,7 @@ describe('ActivityForm', () => {
     )
   })
 
-  it('API error on submit displays role="alert" message', async () => {
+  it('API error on submit displays role="alert" message', async (): Promise<void> => {
     const user = userEvent.setup()
     ;(activitiesApi.log as Mock).mockRejectedValue(new Error('Server error'))
 

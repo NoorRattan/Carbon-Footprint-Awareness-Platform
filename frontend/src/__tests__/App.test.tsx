@@ -49,28 +49,28 @@ function renderApp(route: string) {
 }
 
 describe('App', () => {
-  it('unauthenticated user visiting /dashboard is redirected to /login', async () => {
+  it('unauthenticated user visiting /dashboard is redirected to /login', async (): Promise<void> => {
     renderApp('/dashboard')
     await waitFor(() => {
       expect(screen.getByText(/sign in/i)).toBeInTheDocument()
     })
   })
 
-  it('home page / renders without crashing', async () => {
+  it('home page / renders without crashing', async (): Promise<void> => {
     renderApp('/')
     await waitFor(() => {
       expect(screen.getByText(/understand and reduce your carbon footprint/i)).toBeInTheDocument()
     })
   })
 
-  it('404 page renders for unknown routes', async () => {
+  it('404 page renders for unknown routes', async (): Promise<void> => {
     renderApp('/nonexistent-page')
     await waitFor(() => {
       expect(screen.getByText(/page not found/i)).toBeInTheDocument()
     })
   })
 
-  it('learn page renders without authentication', async () => {
+  it('learn page renders without authentication', async (): Promise<void> => {
     renderApp('/learn')
     await waitFor(() => {
       expect(screen.getByRole('main')).toBeInTheDocument()

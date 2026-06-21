@@ -54,7 +54,7 @@ describe('Modal', () => {
     expect(dialog).toHaveAttribute('aria-labelledby')
   })
 
-  it('close button calls onClose', async () => {
+  it('close button calls onClose', async (): Promise<void> => {
     const user = userEvent.setup()
     const onClose = vi.fn()
     render(
@@ -66,7 +66,7 @@ describe('Modal', () => {
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 
-  it('overlay click calls onClose', async () => {
+  it('overlay click calls onClose', async (): Promise<void> => {
     const user = userEvent.setup()
     const onClose = vi.fn()
     render(
@@ -80,7 +80,7 @@ describe('Modal', () => {
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 
-  it('Escape key calls onClose', async () => {
+  it('Escape key calls onClose', async (): Promise<void> => {
     const user = userEvent.setup()
     const onClose = vi.fn()
     render(
@@ -92,7 +92,7 @@ describe('Modal', () => {
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps keyboard focus inside the dialog', async () => {
+  it('keeps keyboard focus inside the dialog', async (): Promise<void> => {
     const user = userEvent.setup()
     render(
       <Modal isOpen={true} onClose={vi.fn()} title="Focus Test">

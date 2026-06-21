@@ -58,7 +58,7 @@ describe('useActivities', () => {
     expect(result.current.error).toBeNull()
   })
 
-  it('fetchActivities success: sets activities array, loading=false', async () => {
+  it('fetchActivities success: sets activities array, loading=false', async (): Promise<void> => {
     vi.mocked(activitiesApi.getAll).mockResolvedValue({
       activities: [mockActivity],
       total: 1,
@@ -66,7 +66,7 @@ describe('useActivities', () => {
 
     const { result } = renderHook(() => useActivities())
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.fetchActivities()
     })
 
@@ -75,12 +75,12 @@ describe('useActivities', () => {
     expect(result.current.loading).toBe(false)
   })
 
-  it('fetchActivities error: sets error string, loading=false', async () => {
+  it('fetchActivities error: sets error string, loading=false', async (): Promise<void> => {
     vi.mocked(activitiesApi.getAll).mockRejectedValue(new Error('Network error'))
 
     const { result } = renderHook(() => useActivities())
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.fetchActivities()
     })
 
@@ -88,7 +88,7 @@ describe('useActivities', () => {
     expect(result.current.loading).toBe(false)
   })
 
-  it('logActivity calls activitiesApi.log with correct data', async () => {
+  it('logActivity calls activitiesApi.log with correct data', async (): Promise<void> => {
     vi.mocked(activitiesApi.log).mockResolvedValue(mockActivity)
 
     const { result } = renderHook(() => useActivities())
@@ -100,7 +100,7 @@ describe('useActivities', () => {
       date: '2026-01-15',
     }
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.logActivity(payload)
     })
 
@@ -108,7 +108,7 @@ describe('useActivities', () => {
     expect(result.current.activities).toHaveLength(1)
   })
 
-  it('deleteActivity removes item from local state', async () => {
+  it('deleteActivity removes item from local state', async (): Promise<void> => {
     vi.mocked(activitiesApi.getAll).mockResolvedValue({
       activities: [mockActivity, { ...mockActivity, id: 'act-2' }],
       total: 2,
@@ -117,13 +117,13 @@ describe('useActivities', () => {
 
     const { result } = renderHook(() => useActivities())
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.fetchActivities()
     })
 
     expect(result.current.activities).toHaveLength(2)
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.deleteActivity('act-1')
     })
 
@@ -131,7 +131,7 @@ describe('useActivities', () => {
     expect(result.current.activities[0].id).toBe('act-2')
   })
 
-  it('fetchSummary sets summary data', async () => {
+  it('fetchSummary sets summary data', async (): Promise<void> => {
     const summaryData = {
       totalCarbonKg: 100,
       byCategory: {
@@ -147,7 +147,7 @@ describe('useActivities', () => {
 
     const { result } = renderHook(() => useActivities())
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.fetchSummary()
     })
 

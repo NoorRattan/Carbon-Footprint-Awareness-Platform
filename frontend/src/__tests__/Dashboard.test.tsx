@@ -69,7 +69,7 @@ describe('Dashboard Page', () => {
     expect(screen.getByRole('status')).toBeInTheDocument()
   })
 
-  it('renders dashboard content after loading', async () => {
+  it('renders dashboard content after loading', async (): Promise<void> => {
     renderWithProviders(<Dashboard />)
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /Good/i })).toBeInTheDocument()

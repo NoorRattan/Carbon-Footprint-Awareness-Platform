@@ -43,7 +43,7 @@ describe('ActivityList', () => {
     expect(screen.getByRole('status')).toHaveTextContent(/loading/i)
   })
 
-  it('renders empty state when no activities returned', async () => {
+  it('renders empty state when no activities returned', async (): Promise<void> => {
     vi.mocked(activitiesApi.getAll).mockResolvedValue({ activities: [], total: 0 })
     render(<ActivityList />)
     await waitFor(() => {
@@ -51,7 +51,7 @@ describe('ActivityList', () => {
     })
   })
 
-  it('renders error state on API failure', async () => {
+  it('renders error state on API failure', async (): Promise<void> => {
     vi.mocked(activitiesApi.getAll).mockRejectedValue(new Error('API failed'))
     render(<ActivityList />)
     await waitFor(() => {
@@ -59,7 +59,7 @@ describe('ActivityList', () => {
     })
   })
 
-  it('renders activities grouped by date', async () => {
+  it('renders activities grouped by date', async (): Promise<void> => {
     vi.mocked(activitiesApi.getAll).mockResolvedValue({ activities: [mockActivity], total: 1 })
     render(<ActivityList />)
     await waitFor(() => {
@@ -71,7 +71,7 @@ describe('ActivityList', () => {
     })
   })
 
-  it('deletes an activity when delete button is clicked', async () => {
+  it('deletes an activity when delete button is clicked', async (): Promise<void> => {
     const user = userEvent.setup()
     vi.mocked(activitiesApi.getAll).mockResolvedValue({ activities: [mockActivity], total: 1 })
     vi.mocked(activitiesApi.delete).mockResolvedValue(undefined)

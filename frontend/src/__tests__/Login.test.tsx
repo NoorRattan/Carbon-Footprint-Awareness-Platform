@@ -71,7 +71,7 @@ describe('Login', () => {
     expect(screen.getByRole('button', { name: /^sign in$/i })).toBeInTheDocument()
   })
 
-  it('handles Google sign in', async () => {
+  it('handles Google sign in', async (): Promise<void> => {
     const user = userEvent.setup()
     const mockSignInWithGoogle = vi.fn().mockResolvedValue(undefined)
     useAuthSpy.mockReturnValue({
@@ -88,7 +88,7 @@ describe('Login', () => {
     expect(mockSignInWithGoogle).toHaveBeenCalled()
   })
 
-  it('handles Email sign in', async () => {
+  it('handles Email sign in', async (): Promise<void> => {
     const user = userEvent.setup()
     const mockSignInWithEmail = vi.fn().mockResolvedValue(undefined)
     useAuthSpy.mockReturnValue({
@@ -108,7 +108,7 @@ describe('Login', () => {
     expect(mockSignInWithEmail).toHaveBeenCalledWith('test@example.com', 'password123')
   })
 
-  it('displays error message on sign in failure', async () => {
+  it('displays error message on sign in failure', async (): Promise<void> => {
     const user = userEvent.setup()
     const mockSignInWithEmail = vi.fn().mockRejectedValue(new Error('Invalid credentials'))
     useAuthSpy.mockReturnValue({

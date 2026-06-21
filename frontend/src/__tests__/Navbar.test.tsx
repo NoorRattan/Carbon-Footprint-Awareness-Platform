@@ -108,7 +108,7 @@ describe('Navbar', () => {
     expect(screen.queryByRole('link', { name: /sign in/i })).not.toBeInTheDocument()
   })
 
-  it('opens user menu when user button is clicked', async () => {
+  it('opens user menu when user button is clicked', async (): Promise<void> => {
     const user = userEvent.setup()
     useAuthSpy.mockReturnValue({
       user: mockUser,
@@ -128,7 +128,7 @@ describe('Navbar', () => {
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
   })
 
-  it('calls signOut when sign out is clicked', async () => {
+  it('calls signOut when sign out is clicked', async (): Promise<void> => {
     const user = userEvent.setup()
     const mockSignOut = vi.fn().mockResolvedValue(undefined)
     useAuthSpy.mockReturnValue({

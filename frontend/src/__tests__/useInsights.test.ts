@@ -64,12 +64,12 @@ describe('useInsights', () => {
     expect(result.current.loading).toBe(false)
   })
 
-  it('fetchInsights success: sets insight object, loading=false', async () => {
+  it('fetchInsights success: sets insight object, loading=false', async (): Promise<void> => {
     vi.mocked(insightsApi.get).mockResolvedValue(mockInsight)
 
     const { result } = renderHook(() => useInsights())
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.fetchInsights()
     })
 
@@ -77,17 +77,17 @@ describe('useInsights', () => {
     expect(result.current.loading).toBe(false)
   })
 
-  it('acknowledgeRecommendation calls insightsApi.acknowledge with id', async () => {
+  it('acknowledgeRecommendation calls insightsApi.acknowledge with id', async (): Promise<void> => {
     vi.mocked(insightsApi.get).mockResolvedValue(mockInsight)
     vi.mocked(insightsApi.acknowledge).mockResolvedValue(undefined)
 
     const { result } = renderHook(() => useInsights())
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.fetchInsights()
     })
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.acknowledgeRecommendation('r1')
     })
 
@@ -95,12 +95,12 @@ describe('useInsights', () => {
     expect(result.current.insight?.recommendations).toHaveLength(0)
   })
 
-  it('fetchInsights error: sets error string', async () => {
+  it('fetchInsights error: sets error string', async (): Promise<void> => {
     vi.mocked(insightsApi.get).mockRejectedValue(new Error('API down'))
 
     const { result } = renderHook(() => useInsights())
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.fetchInsights()
     })
 

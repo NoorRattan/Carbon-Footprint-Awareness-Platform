@@ -60,14 +60,14 @@ describe('useGoals', () => {
     expect(result.current.error).toBeNull()
   })
 
-  it('fetchGoals success: sets goals array, loading=false', async () => {
+  it('fetchGoals success: sets goals array, loading=false', async (): Promise<void> => {
     vi.mocked(goalsApi.getAll).mockResolvedValue({
       goals: [mockGoal],
     })
 
     const { result } = renderHook(() => useGoals())
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.fetchGoals()
     })
 
@@ -76,12 +76,12 @@ describe('useGoals', () => {
     expect(result.current.loading).toBe(false)
   })
 
-  it('fetchGoals error: sets error string, loading=false', async () => {
+  it('fetchGoals error: sets error string, loading=false', async (): Promise<void> => {
     vi.mocked(goalsApi.getAll).mockRejectedValue(new Error('Network error'))
 
     const { result } = renderHook(() => useGoals())
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.fetchGoals()
     })
 
@@ -89,12 +89,12 @@ describe('useGoals', () => {
     expect(result.current.loading).toBe(false)
   })
 
-  it('createGoal calls goalsApi.create and adds to local state', async () => {
+  it('createGoal calls goalsApi.create and adds to local state', async (): Promise<void> => {
     vi.mocked(goalsApi.create).mockResolvedValue(mockGoal)
 
     const { result } = renderHook(() => useGoals())
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.createGoal({
         title: 'Reduce transport',
         category: 'transport',
@@ -107,17 +107,17 @@ describe('useGoals', () => {
     expect(result.current.goals).toHaveLength(1)
   })
 
-  it('updateGoal calls goalsApi.update and updates local state', async () => {
+  it('updateGoal calls goalsApi.update and updates local state', async (): Promise<void> => {
     vi.mocked(goalsApi.getAll).mockResolvedValue({ goals: [mockGoal] })
     vi.mocked(goalsApi.update).mockResolvedValue(undefined)
 
     const { result } = renderHook(() => useGoals())
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.fetchGoals()
     })
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.updateGoal('goal-1', { title: 'Updated title' })
     })
 
@@ -125,7 +125,7 @@ describe('useGoals', () => {
     expect(result.current.goals[0].title).toBe('Updated title')
   })
 
-  it('deleteGoal removes item from local state', async () => {
+  it('deleteGoal removes item from local state', async (): Promise<void> => {
     vi.mocked(goalsApi.getAll).mockResolvedValue({
       goals: [mockGoal, { ...mockGoal, id: 'goal-2' }],
     })
@@ -133,13 +133,13 @@ describe('useGoals', () => {
 
     const { result } = renderHook(() => useGoals())
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.fetchGoals()
     })
 
     expect(result.current.goals).toHaveLength(2)
 
-    await act(async () => {
+    await act(async (): Promise<void> => {
       await result.current.deleteGoal('goal-1')
     })
 

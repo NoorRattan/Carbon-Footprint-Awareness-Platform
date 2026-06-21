@@ -60,7 +60,7 @@ describe('SmartAdvisor', () => {
     expect(screen.getByRole('status')).toBeInTheDocument()
   })
 
-  it('renders recommendations sorted by saving (highest first)', async () => {
+  it('renders recommendations sorted by saving (highest first)', async (): Promise<void> => {
     vi.mocked(insightsApi.get).mockResolvedValue({
       footprintKg: 120,
       vsAveragePercent: 15,
@@ -97,7 +97,7 @@ describe('SmartAdvisor', () => {
     expect(screen.getByText('Small saving')).toBeInTheDocument()
   })
 
-  it('clicking "Mark as done" calls insightsApi.acknowledge with correct id', async () => {
+  it('clicking "Mark as done" calls insightsApi.acknowledge with correct id', async (): Promise<void> => {
     const user = userEvent.setup()
     vi.mocked(insightsApi.get).mockResolvedValue({
       footprintKg: 100,
@@ -129,7 +129,7 @@ describe('SmartAdvisor', () => {
     expect(insightsApi.acknowledge).toHaveBeenCalledWith('rec-42')
   })
 
-  it('empty state shown when recommendations array is empty', async () => {
+  it('empty state shown when recommendations array is empty', async (): Promise<void> => {
     vi.mocked(insightsApi.get).mockResolvedValue({
       footprintKg: 50,
       vsAveragePercent: -10,
@@ -149,7 +149,7 @@ describe('SmartAdvisor', () => {
     })
   })
 
-  it('insight banner shows correct above/below percentage', async () => {
+  it('insight banner shows correct above/below percentage', async (): Promise<void> => {
     vi.mocked(insightsApi.get).mockResolvedValue({
       footprintKg: 200,
       vsAveragePercent: 25,

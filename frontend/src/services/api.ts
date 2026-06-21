@@ -235,7 +235,7 @@ apiClient.interceptors.request.use(
    * @param config The Axios request config.
    * @returns The modified Axios request config.
    */
-  async (config: InternalAxiosRequestConfig) => {
+  async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
     if (auth.currentUser) {
       const token = await auth.currentUser.getIdToken()
       config.headers.Authorization = `Bearer ${token}`
@@ -265,7 +265,7 @@ apiClient.interceptors.response.use(
    * @param error The response error.
    * @returns Rejected promise with the error.
    */
-  async (error: AxiosError) => {
+  async (error: AxiosError<unknown>): Promise<never> => {
     if (error.response?.status === 401) {
       await auth.signOut()
       window.location.href = '/login'

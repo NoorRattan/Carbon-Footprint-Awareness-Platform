@@ -41,7 +41,7 @@ const TestComponent = () => {
 }
 
 describe('AuthContext', () => {
-  it('provides user state and auth methods', async () => {
+  it('provides user state and auth methods', async (): Promise<void> => {
     render(
       <AuthProvider>
         <TestComponent />

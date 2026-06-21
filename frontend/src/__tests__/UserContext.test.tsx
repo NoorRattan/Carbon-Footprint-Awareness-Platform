@@ -50,7 +50,7 @@ const TestComponent = () => {
 }
 
 describe('UserContext', () => {
-  it('fetches profile when user is present', async () => {
+  it('fetches profile when user is present', async (): Promise<void> => {
     render(
       <AuthContext.Provider
         value={{
@@ -76,7 +76,7 @@ describe('UserContext', () => {
     expect(userApi.updateProfile).toHaveBeenCalledWith({ displayName: 'New Name' })
   })
 
-  it('handles unauthenticated state', async () => {
+  it('handles unauthenticated state', async (): Promise<void> => {
     const { onAuthStateChanged } = await import('firebase/auth')
     vi.mocked(onAuthStateChanged).mockImplementationOnce((_auth, callback) => {
       const authCallback = callback as (user: unknown) => void
