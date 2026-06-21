@@ -26,9 +26,7 @@ class TestCorsConfiguration:
         assert "https://ecotrack-app-2026-1.firebaseapp.com" in allowed_origins
         assert "https://custom.example.com" in allowed_origins
 
-    async def test_cors_preflight_allows_configured_origin(
-        self, async_client: AsyncClient
-    ) -> None:
+    async def test_cors_preflight_allows_configured_origin(self, async_client: AsyncClient) -> None:
         """CORS middleware returns allow-origin for a configured browser origin.
 
         Args:
