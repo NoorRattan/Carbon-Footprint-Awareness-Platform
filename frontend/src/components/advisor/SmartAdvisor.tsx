@@ -97,7 +97,7 @@ const SmartAdvisor: React.FC = () => {
       <h2 className="text-2xl font-bold text-slate-800">Your Personalised Carbon Advisor</h2>
 
       {/* Insight banner */}
-      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl p-5 border border-primary/20">
+      <div className="bg-linear-to-r from-primary/10 to-secondary/10 rounded-xl p-5 border border-primary/20">
         <p className="text-slate-800 text-lg">
           Your footprint is <strong>{formatCarbon(insight.footprintKg)}</strong> this month &mdash;{' '}
           {insight.vsAveragePercent > 0 ? (

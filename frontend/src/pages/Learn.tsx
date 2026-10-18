@@ -53,7 +53,7 @@ const Learn: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveFilter(cat)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                   activeFilter === cat
                     ? 'bg-primary text-white'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -93,7 +93,7 @@ const Learn: React.FC = () => {
             <Link
               key={article.slug}
               to={`/learn/${article.slug}`}
-              className="block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-xl"
+              className="block focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-xl"
             >
               <Card hoverable className="h-full">
                 <div className="space-y-3">

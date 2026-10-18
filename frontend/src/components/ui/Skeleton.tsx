@@ -13,7 +13,7 @@ export interface SkeletonProps {
  * @returns An animated placeholder div.
  */
 export const Skeleton = memo(function Skeleton({ className = '' }: SkeletonProps): ReactElement {
-  return <div aria-hidden="true" className={`animate-pulse rounded bg-slate-200 ${className}`} />
+  return <div aria-hidden="true" className={`animate-pulse rounded-sm bg-slate-200 ${className}`} />
 })
 
 Skeleton.displayName = 'Skeleton'

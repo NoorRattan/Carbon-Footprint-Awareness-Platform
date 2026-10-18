@@ -182,7 +182,7 @@ const Profile: React.FC = () => {
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary"
               />
             </div>
 
@@ -213,7 +213,7 @@ const Profile: React.FC = () => {
                 id="profile-region"
                 value={region}
                 onChange={(e) => setRegion(e.target.value as UserRegion)}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary"
               >
                 {REGIONS.map((r) => (
                   <option key={r.value} value={r.value}>
@@ -234,7 +234,7 @@ const Profile: React.FC = () => {
                 id="profile-diet"
                 value={dietType}
                 onChange={(e) => setDietType(e.target.value as DietType)}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary"
               >
                 {DIET_TYPES.map((d) => (
                   <option key={d.value} value={d.value}>
@@ -258,7 +258,7 @@ const Profile: React.FC = () => {
                 max="20"
                 value={householdSize}
                 onChange={(e) => setHouseholdSize(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary"
               />
             </div>
 

@@ -33,7 +33,7 @@ export const Card = memo(function Card({
   return (
     <div
       className={`
-        bg-white rounded-xl shadow-sm border border-slate-200
+        bg-white rounded-xl shadow-xs border border-slate-200
         ${paddingClasses[padding]}
         ${hoverable ? 'transition-shadow duration-200 hover:shadow-md' : ''}
         ${className}

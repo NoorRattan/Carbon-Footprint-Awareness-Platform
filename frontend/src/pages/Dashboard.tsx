@@ -142,7 +142,7 @@ const Dashboard: React.FC = () => {
               <Button onClick={() => navigate('/log')}>Log an Activity</Button>
               <Link
                 to="/learn"
-                className="text-primary hover:underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1"
+                className="text-primary hover:underline font-medium focus:outline-hidden focus:ring-2 focus:ring-primary rounded-sm px-2 py-1"
               >
                 Or explore how it works
               </Link>
@@ -192,7 +192,7 @@ const Dashboard: React.FC = () => {
               <div className="mt-4">
                 <Link
                   to="/insights"
-                  className="text-primary hover:underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1"
+                  className="text-primary hover:underline font-medium focus:outline-hidden focus:ring-2 focus:ring-primary rounded-sm px-2 py-1"
                 >
                   See all insights →
                 </Link>

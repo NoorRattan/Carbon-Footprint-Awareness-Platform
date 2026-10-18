@@ -75,6 +75,9 @@ describe('Goals Page', () => {
 
   it('creates a new goal from the form', async (): Promise<void> => {
     const user = userEvent.setup()
+    const targetDate = new Date()
+    targetDate.setDate(targetDate.getDate() + 30)
+    const endDate = targetDate.toISOString().split('T')[0]
     const createdGoal: Goal = {
       id: 'goal-1',
       title: 'Reduce electricity',
@@ -83,7 +86,7 @@ describe('Goals Page', () => {
       baselineCarbonKg: 100,
       targetCarbonKg: 75,
       startDate: '2026-06-20',
-      endDate: '2026-07-20',
+      endDate,
       status: 'active',
       createdAt: '2026-06-20T00:00:00Z',
     }
@@ -98,7 +101,7 @@ describe('Goals Page', () => {
     await user.selectOptions(screen.getByLabelText(/category/i), 'energy')
     await user.type(screen.getByLabelText(/goal title/i), 'Reduce electricity')
     await user.clear(screen.getByLabelText(/target date/i))
-    await user.type(screen.getByLabelText(/target date/i), '2026-07-20')
+    await user.type(screen.getByLabelText(/target date/i), endDate)
     await user.click(screen.getByRole('button', { name: /set goal/i }))
 
     await waitFor(() => {
@@ -106,7 +109,7 @@ describe('Goals Page', () => {
         title: 'Reduce electricity',
         category: 'energy',
         targetReductionPercent: 20,
-        endDate: '2026-07-20',
+        endDate,
       })
     })
   })

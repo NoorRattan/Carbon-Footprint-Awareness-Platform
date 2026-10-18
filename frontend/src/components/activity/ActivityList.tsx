@@ -118,10 +118,10 @@ const ActivityList: React.FC = () => {
               return (
                 <div
                   key={activity.id}
-                  className="flex items-center justify-between bg-white rounded-lg border border-slate-200 p-3 hover:shadow-sm transition-shadow"
+                  className="flex items-center justify-between bg-white rounded-lg border border-slate-200 p-3 hover:shadow-xs transition-shadow"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span aria-hidden="true" className="text-xl flex-shrink-0">
+                    <span aria-hidden="true" className="text-xl shrink-0">
                       {getCategoryIcon(activity.category)}
                     </span>
                     <div className="min-w-0">

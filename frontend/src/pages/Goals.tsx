@@ -180,7 +180,7 @@ const Goals: React.FC = () => {
                 id="goal-category"
                 value={goalCategory}
                 onChange={(e) => setGoalCategory(e.target.value as GoalCategory)}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary"
               >
                 {GOAL_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -201,7 +201,7 @@ const Goals: React.FC = () => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Reduce transport emissions"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary"
               />
             </div>
 
@@ -242,7 +242,7 @@ const Goals: React.FC = () => {
                 min={minDate}
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary"
               />
             </div>
 

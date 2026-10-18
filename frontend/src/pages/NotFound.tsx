@@ -19,13 +19,13 @@ const NotFound: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
         <Link
           to="/"
-          className="text-primary hover:underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1"
+          className="text-primary hover:underline font-medium focus:outline-hidden focus:ring-2 focus:ring-primary rounded-sm px-2 py-1"
         >
           Go home
         </Link>
         <Link
           to="/dashboard"
-          className="text-primary hover:underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1"
+          className="text-primary hover:underline font-medium focus:outline-hidden focus:ring-2 focus:ring-primary rounded-sm px-2 py-1"
         >
           Go to Dashboard
         </Link>

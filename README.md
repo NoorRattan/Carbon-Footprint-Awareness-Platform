@@ -45,7 +45,7 @@ Browser
 
 ### Prerequisites
 
-- Node.js 20 LTS
+- Node.js 24 LTS
 - Python 3.11
 - A Firebase project with Firestore and Auth enabled
 

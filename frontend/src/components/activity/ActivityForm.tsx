@@ -154,10 +154,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
                     setCategory(cat)
                     setStep(2)
                   }}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                     category === cat
                       ? 'border-primary bg-primary/5 shadow-md'
-                      : 'border-slate-200 hover:border-slate-300 hover:shadow-sm'
+                      : 'border-slate-200 hover:border-slate-300 hover:shadow-xs'
                   }`}
                   aria-pressed={category === cat}
                 >
@@ -182,7 +182,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="text-sm text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
+              className="text-sm text-primary hover:underline focus:outline-hidden focus:ring-2 focus:ring-primary rounded-sm"
             >
               Change category
             </button>
@@ -198,7 +198,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
               id="subcategory-select"
               value={subcategory}
               onChange={(e) => setSubcategory(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary"
             >
               {subcategories.map((sub) => (
                 <option key={sub} value={sub}>
@@ -221,7 +221,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
             <button
               type="button"
               onClick={() => setStep(2)}
-              className="text-sm text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
+              className="text-sm text-primary hover:underline focus:outline-hidden focus:ring-2 focus:ring-primary rounded-sm"
             >
               Change type
             </button>
@@ -238,7 +238,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder={currentSubMeta?.placeholder || 'Enter amount'}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
 
@@ -277,7 +277,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
               max={today}
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
           <div className="flex justify-between">
@@ -304,7 +304,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
               maxLength={200}
               rows={3}
               placeholder="Add optional details..."
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-none"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary resize-none"
             />
             <p className="text-xs text-slate-400 mt-1">{notes.length}/200 characters</p>
           </div>

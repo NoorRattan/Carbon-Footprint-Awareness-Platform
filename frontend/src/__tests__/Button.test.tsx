@@ -56,7 +56,7 @@ describe('Button', () => {
   })
 
   it.each(['primary', 'secondary', 'ghost', 'danger'] as const)(
-    'variant="%s" renders with focus ring classes',
+    'variant="%s" renders with focus ring-3 classes',
     (variant) => {
       render(<Button variant={variant}>{variant}</Button>)
       const button = screen.getByRole('button', { name: variant })

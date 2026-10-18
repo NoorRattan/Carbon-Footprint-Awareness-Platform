@@ -76,7 +76,7 @@ const Input: React.FC<InputProps> = ({
           className={`
             w-full rounded-lg border px-3 py-2 text-sm
             transition-colors duration-200
-            focus:outline-none focus:ring-2 focus:ring-offset-0
+            focus:outline-hidden focus:ring-2 focus:ring-offset-0
             disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed
             ${
               error

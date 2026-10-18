@@ -28,7 +28,7 @@ const Home: React.FC = () => {
             </Button>
             <a
               href="#how-it-works"
-              className="text-primary hover:text-primary-dark font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1"
+              className="text-primary hover:text-primary-dark font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary rounded-sm px-2 py-1"
             >
               See How It Works
             </a>
@@ -90,7 +90,7 @@ const Home: React.FC = () => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Step 1: Log */}
-          <div className="text-center space-y-4 p-6 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="text-center space-y-4 p-6 rounded-xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex justify-center" aria-hidden="true">
               <svg
                 width="64"
@@ -130,7 +130,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* Step 2: Analyse */}
-          <div className="text-center space-y-4 p-6 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="text-center space-y-4 p-6 rounded-xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex justify-center" aria-hidden="true">
               <svg
                 width="64"
@@ -160,7 +160,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* Step 3: Reduce */}
-          <div className="text-center space-y-4 p-6 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="text-center space-y-4 p-6 rounded-xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex justify-center" aria-hidden="true">
               <svg
                 width="64"

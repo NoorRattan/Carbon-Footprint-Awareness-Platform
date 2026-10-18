@@ -71,7 +71,7 @@ const Navbar: React.FC = () => {
     >
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-sm"
       >
         Skip to main content
       </a>
@@ -106,7 +106,7 @@ const Navbar: React.FC = () => {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   aria-expanded={userMenuOpen}
                   aria-haspopup="true"
-                  className="flex items-center gap-2 text-sm text-slate-700 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-lg px-2 py-1"
+                  className="flex items-center gap-2 text-sm text-slate-700 hover:text-primary transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-lg px-2 py-1"
                 >
                   {user.photoURL ? (
                     <img src={user.photoURL} alt="" className="h-8 w-8 rounded-full object-cover" />
@@ -157,7 +157,7 @@ const Navbar: React.FC = () => {
             ) : (
               <Link
                 to="/login"
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               >
                 Sign In
               </Link>
@@ -167,7 +167,7 @@ const Navbar: React.FC = () => {
           {/* Mobile Hamburger */}
           <button
             type="button"
-            className="md:hidden p-2 text-slate-600 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-lg"
+            className="md:hidden p-2 text-slate-600 hover:text-primary transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-lg"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-menu"

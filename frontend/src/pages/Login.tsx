@@ -119,7 +119,7 @@ const Login: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary"
               />
             </div>
 
@@ -137,7 +137,7 @@ const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-primary"
               />
             </div>
 
@@ -163,7 +163,7 @@ const Login: React.FC = () => {
         By signing in you agree to our{' '}
         <a
           href="/privacy"
-          className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
+          className="text-primary hover:underline focus:outline-hidden focus:ring-2 focus:ring-primary rounded-sm"
         >
           Privacy Policy
         </a>
